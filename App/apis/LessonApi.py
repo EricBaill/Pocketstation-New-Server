@@ -392,6 +392,7 @@ class LessonResource1(Resource):
             return jsonify({})
 
     def delete(self,id):
+        print(id)
         lesson = Lesson.query.filter(Lesson.id.__eq__(id)).first()
         if lesson:
             db.session.delete(lesson)

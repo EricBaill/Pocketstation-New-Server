@@ -25,6 +25,7 @@ class StaffRespource(Resource):
                         'pos':{
                             'id':pos.id,
                             'name':pos.name,
+                            'is_manager':pos.is_manager,
                             'bu':{
                                 'id':bu.id,
                                 'name':bu.name

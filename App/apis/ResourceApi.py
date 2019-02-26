@@ -88,7 +88,7 @@ class ResourceApi2(Resource):
                         'type':re.type,
                         'hier':{
                             'name':r.name,
-                            'id':r.p_id
+                            'id':r.id
                         }
                     }
                     list_.append(data)
@@ -106,7 +106,7 @@ class ResourceApi3(Resource):
             res.name = name
             res.content = content
             res.type = type
-            res.hier = hier
+            res.p_id = hier
             db.session.commit()
             re = DealerResource.query.filter(DealerResource.id.__eq__(hier)).first()
             data = {
@@ -123,6 +123,51 @@ class ResourceApi3(Resource):
         else:
             return jsonify({})
 
+class ResourceApi4(Resource):
+    def get(self):
+        res = DealerResource.query.all()
+        list_ = []
+        for re in res:
+            if re.type == 'folder':
+                rs = DealerResource.query.filter(DealerResource.id == re.p_id).all()
+                for r in rs:
+                    data = {
+                        'id': re.id,
+                        'name': re.name,
+                        'content': re.content,
+                        'type': re.type,
+                        'hier': {
+                            'name': r.name,
+                            'id': r.id
+                        }
+                    }
+                    list_.append(data)
+        print(list_)
+        return jsonify(list_)
 
+class ResourceApi5(Resource):
+    def put(self,resId):
+        parser = reqparse.RequestParser()
+        parser.add_argument(name='name', type=str, required=True, help='名称不能为空')
+        parser.add_argument(name='p_id', type=int)
+        parse = parser.parse_args()
+        name = parse.get('name')
+        p_id = parse.get('p_id')
+        res = DealerResource.query.filter(DealerResource.id.__eq__(resId)).first()
+        if res:
+            res.name = name
+            res.p_id = p_id
+            db.session.commit()
+            return jsonify({'msg':'修改成功！'})
+        else:
+            return jsonify({'msg':'暂无信息！'})
 
+    def delete(self,resId):
+        res = DealerResource.query.filter(DealerResource.id.__eq__(resId)).first()
+        if res:
+            db.session.delete(res)
+            db.session.commit()
+            return jsonify({'msg':'删除成功！'})
+        else:
+            return jsonify({'msg':'暂无信息！'})
 

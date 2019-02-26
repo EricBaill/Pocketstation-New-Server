@@ -327,7 +327,7 @@ class Point(db.Model):
 #     staff = db.relationship('User', primaryjoin='PointsRecord.staff_id == User.id', backref='points_record')
 
 
-#资源表
+#经销商资源表
 class DealerResource(db.Model):
     __tablename__ = 'resources'
 
@@ -338,6 +338,7 @@ class DealerResource(db.Model):
     content = db.Column(db.String(512), nullable=True)
     # downloads = db.Column(db.Integer, nullable=False)
 
+#员工资源表
 class UserResource(db.Model):
     __tablename__ = 'user_resources'
 

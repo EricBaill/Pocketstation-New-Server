@@ -25,7 +25,7 @@ from App.apis.NewsClsApi import NewsClsResource, NewsClsResource1
 from App.apis.OperationApi import OperationResource, OperationResource1, OperationResource2
 from App.apis.PointsApi import PointsResource
 from App.apis.PositionApi import PositionResource, PositionResource1, PositionResource2
-from App.apis.ResourceApi import ResourceApi, ResourceApi1, ResourceApi2, ResourceApi3
+from App.apis.ResourceApi import ResourceApi, ResourceApi1, ResourceApi2, ResourceApi3, ResourceApi4, ResourceApi5
 from App.apis.StaffApi import StaffRespource, StaffRespource1, StaffRespource2
 from App.apis.StaffTestApi import StaffTestResource, StaffTestResource1
 from App.apis.Staff_bannerApi import StaffBannerResource
@@ -35,7 +35,8 @@ from App.apis.ToolCollectionApi import ToolCollResource, ToolCollResource1, Tool
 from App.apis.ToolsApi import ToolsResource, ToolsResource1
 from App.apis.TrainTaskApi import TrainTaskResource, TrainTaskResource1
 from App.apis.UserQuesApi import UserQuesResource, UserQuesResource1, UserQuesResource2
-from App.apis.UserResourceApi import UserResourceApi, UserResourceApi1, UserResourceApi2
+from App.apis.UserResourceApi import UserResourceApi, UserResourceApi1, UserResourceApi2, UserResourceApi3, \
+    UserResourceApi4, UserResourceApi5
 
 api = Api()
 #需要注意  api的初始化 要和init方法联系 否则无法初始化
@@ -76,6 +77,8 @@ api.add_resource(ResourceApi,'/api/v2/resources/<resId>')
 api.add_resource(ResourceApi1,'/api/v2/hier/')
 api.add_resource(ResourceApi2,'/api/v2/resources/all/')
 api.add_resource(ResourceApi3,'/api/v2/resources/<id>')
+api.add_resource(ResourceApi4,'/api/v2/resources/folder/')
+api.add_resource(ResourceApi5,'/api/v2/dealer/resources/<resId>/')
 
 #获取所有互动信息
 api.add_resource(DealerActiApi4,'/api/v2/QA/actions')
@@ -181,6 +184,9 @@ api.add_resource(UserResourceApi,'/api/v2/staff/<user_id>/hier/<hier>/resources/
 api.add_resource(UserResourceApi1,'/api/v2/staff/resource/<resId>/')
 
 api.add_resource(UserResourceApi2,'/api/v2/staff/getresource/')
+api.add_resource(UserResourceApi3,'/api/v2/staff/resource/hier/')
+api.add_resource(UserResourceApi4,'/api/v2/staff/getresource/folder/')
+api.add_resource(UserResourceApi5,'/api/v2/staff/resourcees/<resId>/')
 
 #员工考试
 api.add_resource(UserQuesResource,'/api/v2/questions/')
