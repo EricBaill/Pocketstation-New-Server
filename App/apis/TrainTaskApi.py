@@ -26,6 +26,7 @@ class TrainTaskResource(Resource):
                         'name':user.name,
                         'email':user.email,
                         'tel':user.tel,
+                        'status':user.lesson_,
                         },
                     'lsn': {
                         'id': lsn.id,
@@ -73,3 +74,51 @@ class TrainTaskResource1(Resource):
         else:
             return jsonify({})
 
+class LearnTask(Resource):
+    def get(self,staff_id):
+        list_ = []
+        learns = TrainingTask.query.filter(TrainingTask.staff_id==staff_id).all()
+        staff = User.query.filter(User.id==staff_id).first()
+        if staff:
+            lesson_ = {
+                'lesson':staff.lesson_
+            }
+        else:
+            pass
+        if learns:
+            for learn in learns:
+                lessons = Lesson.query.filter(Lesson.id==learn.lsn_id).all()
+                if lessons:
+                    for lesson in lessons:
+                        data = {
+                            'id':learn.id,
+                            'finish_at':learn.finish_at,
+                            'lsn':{
+                                'id':lesson.id,
+                                'name':lesson.name
+                            }
+                        }
+                        list_.append(data)
+            return jsonify(list_,lesson_)
+        else:
+            return jsonify([])
+
+#员工学习课程记录
+class LearnTask1(Resource):
+    def get(self,staff_id,lsn_id):
+        staff = User.query.filter(User.id==staff_id).first()
+        if staff:
+            if staff.lesson_:
+                str1 = staff.lesson_ + '#' + lsn_id
+                str2 = str1.split('#')
+                str3 = list(set(str2))
+                staff.lesson_ = "#".join(str3)
+                db.session.commit()
+                return jsonify({'msg':'成功'})
+            else:
+                staff.lesson_ = lsn_id
+                db.session.commit()
+                return jsonify({'msg': '成功'})
+
+        else:
+            return jsonify({})

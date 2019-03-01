@@ -14,23 +14,23 @@ class GratStarResource(Resource):
         bu0 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(pos0.bu_id)).first()
         if user0:
             data0 = {
-            'staff':{
-                'id':user0.id,
-                'name':user0.name,
-                'email':user0.email,
-                'avatar':user0.img_src,
-            },
-            'pos':{
-                'name':pos0.name,
-            },
-            'bu':{
-                'name':bu0.name,
-                'id':bu0.id
-            },
-            'id':list_1[-1].id,
-            'create_at':list_1[-1].create_at,
-            'year_month':list_1[-1].year_month
-        }
+                'staff':{
+                    'id':user0.id,
+                    'name':user0.name,
+                    'email':user0.email,
+                    'avatar':user0.img_src,
+                },
+                'pos':{
+                    'name':pos0.name,
+                },
+                'bu':{
+                    'name':bu0.name,
+                    'id':bu0.id
+                },
+                'id':list_1[-1].id,
+                'create_at':list_1[-1].create_at,
+                'year_month':list_1[-1].year_month
+            }
             return jsonify(data0)
         else:
             return jsonify({})

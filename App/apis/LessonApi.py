@@ -2,7 +2,7 @@ from flask import jsonify
 from flask_restful import Resource, reqparse
 
 from App.models import Lesson, LessonClas, Operation, db, User, Position, BusinessUnit, LessonPermission, \
-    Tool, LessonThumb, LessonCollection, Admin
+    Tool, LessonThumb, LessonCollection, Admin, Question
 
 parser = reqparse.RequestParser()
 parser.add_argument(name='name', type=str)
@@ -165,7 +165,7 @@ class LessonResource1(Resource):
     def get(self,id):
         lessons = []
         lesson = Lesson.query.filter(Lesson.id.__eq__(id)).first()
-
+        ques = Question.query.filter(Question.lsn_id == lesson.id).first()
         oper = Operation.query.filter(Operation.id.__eq__(lesson.oper_id)).first()
         lescls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
         if lesson.lecturer_id:
@@ -189,6 +189,108 @@ class LessonResource1(Resource):
                 tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
                 if tools:
                     for tool in tools:
+                        if ques:
+                            data = {
+                                "be_thumbs": be_thumbs,
+                                "img_src": lesson.img_src,
+                                'tags': [],
+                                "lecturer": {
+                                    'name': user.name,
+                                    'avatar': user.img_src,
+                                    'lessons': lessons,
+                                    'pos': {
+                                        'id': pos.id,
+                                        'name': pos.name,
+                                        'bu': {
+                                            'name': bu.name,
+                                            'id': bu.id
+                                        },
+                                    }
+                                },
+                                'oprt': {
+                                    'id': oper.id,
+                                    'name': oper.name,
+                                    'cls': {
+                                        'id': lescls.id,
+                                        'name': lescls.name
+                                    }
+                                },
+                                'contents': [lesson.content],
+                                'id': lesson.id,
+                                'name': lesson.name,
+                                'be_collected': be_collected,
+                                'type': lesson.type,
+                                'tools': {
+                                    'name': tool.name,
+                                    'type': tool.type,
+                                    'id': tool.id,
+                                    'content': tool.content
+                                },
+                                'passed': False,
+                                'test': True,
+                                'create_at': lesson.create_at,
+                                'lesson_permissions': {
+                                    'bu': {
+                                        'name': bu1.name,
+                                        'id': bu1.id
+                                    },
+                                    "need_manager": 0,
+                                    'id': les_permission.id
+                                },
+                            }
+                            return jsonify(data)
+                        else:
+                            data = {
+                                "be_thumbs": be_thumbs,
+                                "img_src": lesson.img_src,
+                                'tags': [],
+                                "lecturer": {
+                                    'name': user.name,
+                                    'avatar': user.img_src,
+                                    'lessons': lessons,
+                                    'pos': {
+                                        'id': pos.id,
+                                        'name': pos.name,
+                                        'bu': {
+                                            'name': bu.name,
+                                            'id': bu.id
+                                        },
+                                    }
+                                },
+                                'oprt': {
+                                    'id': oper.id,
+                                    'name': oper.name,
+                                    'cls': {
+                                        'id': lescls.id,
+                                        'name': lescls.name
+                                    }
+                                },
+                                'contents': [lesson.content],
+                                'id': lesson.id,
+                                'name': lesson.name,
+                                'be_collected': be_collected,
+                                'type': lesson.type,
+                                'tools': {
+                                    'name': tool.name,
+                                    'type': tool.type,
+                                    'id': tool.id,
+                                    'content': tool.content
+                                },
+                                'passed': False,
+                                'test': False,
+                                'create_at': lesson.create_at,
+                                'lesson_permissions': {
+                                    'bu': {
+                                        'name': bu1.name,
+                                        'id': bu1.id
+                                    },
+                                    "need_manager": 0,
+                                    'id': les_permission.id
+                                },
+                            }
+                            return jsonify(data)
+                else:
+                    if ques:
                         data = {
                             "be_thumbs": be_thumbs,
                             "img_src": lesson.img_src,
@@ -219,13 +321,9 @@ class LessonResource1(Resource):
                             'name': lesson.name,
                             'be_collected': be_collected,
                             'type': lesson.type,
-                            'tools': {
-                                'name': tool.name,
-                                'type': tool.type,
-                                'id': tool.id,
-                                'content': tool.content
-                            },
-                            'passed': 'false',
+                            'tools': [],
+                            'passed': False,
+                            'test': True,
                             'create_at': lesson.create_at,
                             'lesson_permissions': {
                                 'bu': {
@@ -237,50 +335,51 @@ class LessonResource1(Resource):
                             },
                         }
                         return jsonify(data)
-                else:
-                    data = {
-                        "be_thumbs": be_thumbs,
-                        "img_src": lesson.img_src,
-                        'tags': [],
-                        "lecturer": {
-                            'name': user.name,
-                            'avatar': user.img_src,
-                            'lessons': lessons,
-                            'pos': {
-                                'id': pos.id,
-                                'name': pos.name,
-                                'bu': {
-                                    'name': bu.name,
-                                    'id': bu.id
-                                },
-                            }
-                        },
-                        'oprt': {
-                            'id': oper.id,
-                            'name': oper.name,
-                            'cls': {
-                                'id': lescls.id,
-                                'name': lescls.name
-                            }
-                        },
-                        'contents': [lesson.content],
-                        'id': lesson.id,
-                        'name': lesson.name,
-                        'be_collected': be_collected,
-                        'type': lesson.type,
-                        'tools': [],
-                        'passed': 'false',
-                        'create_at': lesson.create_at,
-                        'lesson_permissions': {
-                            'bu': {
-                                'name': bu1.name,
-                                'id': bu1.id
+                    else:
+                        data = {
+                            "be_thumbs": be_thumbs,
+                            "img_src": lesson.img_src,
+                            'tags': [],
+                            "lecturer": {
+                                'name': user.name,
+                                'avatar': user.img_src,
+                                'lessons': lessons,
+                                'pos': {
+                                    'id': pos.id,
+                                    'name': pos.name,
+                                    'bu': {
+                                        'name': bu.name,
+                                        'id': bu.id
+                                    },
+                                }
                             },
-                            "need_manager": 0,
-                            'id': les_permission.id
-                        },
-                    }
-                    return jsonify(data)
+                            'oprt': {
+                                'id': oper.id,
+                                'name': oper.name,
+                                'cls': {
+                                    'id': lescls.id,
+                                    'name': lescls.name
+                                }
+                            },
+                            'contents': [lesson.content],
+                            'id': lesson.id,
+                            'name': lesson.name,
+                            'be_collected': be_collected,
+                            'type': lesson.type,
+                            'tools': [],
+                            'passed': False,
+                            'test': False,
+                            'create_at': lesson.create_at,
+                            'lesson_permissions': {
+                                'bu': {
+                                    'name': bu1.name,
+                                    'id': bu1.id
+                                },
+                                "need_manager": 0,
+                                'id': les_permission.id
+                            },
+                        }
+                        return jsonify(data)
         else:
             les_permissions = LessonPermission.query.filter(LessonPermission.lsn_id.__eq__(lesson.id)).all()
             for les_permission in les_permissions:
@@ -296,6 +395,84 @@ class LessonResource1(Resource):
                 tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
                 if tools:
                     for tool in tools:
+                        if ques:
+                            data = {
+                                "be_thumbs": be_thumbs,
+                                "img_src": lesson.img_src,
+                                'tags': [],
+                                "lecturer": {},
+                                'oprt': {
+                                    'id': oper.id,
+                                    'name': oper.name,
+                                    'cls': {
+                                        'id': lescls.id,
+                                        'name': lescls.name
+                                    }
+                                },
+                                'contents': lesson.content,
+                                'id': lesson.id,
+                                'name': lesson.name,
+                                'be_collected': be_collected,
+                                'type': lesson.type,
+                                'tools': {
+                                    'name': tool.name,
+                                    'type': tool.type,
+                                    'id': tool.id,
+                                    'content': tool.content
+                                },
+                                'passed': False,
+                                'test': True,
+                                'create_at': lesson.create_at,
+                                'lesson_permissions': {
+                                    'bu': {
+                                        'name': bu1.name,
+                                        'id': bu1.id
+                                    },
+                                    "need_manager": 0,
+                                    'id': les_permission.id
+                                },
+                            }
+                            return jsonify(data)
+                        else:
+                            data = {
+                                "be_thumbs": be_thumbs,
+                                "img_src": lesson.img_src,
+                                'tags': [],
+                                "lecturer": {},
+                                'oprt': {
+                                    'id': oper.id,
+                                    'name': oper.name,
+                                    'cls': {
+                                        'id': lescls.id,
+                                        'name': lescls.name
+                                    }
+                                },
+                                'contents': lesson.content,
+                                'id': lesson.id,
+                                'name': lesson.name,
+                                'be_collected': be_collected,
+                                'type': lesson.type,
+                                'tools': {
+                                    'name': tool.name,
+                                    'type': tool.type,
+                                    'id': tool.id,
+                                    'content': tool.content
+                                },
+                                'passed': False,
+                                'test': False,
+                                'create_at': lesson.create_at,
+                                'lesson_permissions': {
+                                    'bu': {
+                                        'name': bu1.name,
+                                        'id': bu1.id
+                                    },
+                                    "need_manager": 0,
+                                    'id': les_permission.id
+                                },
+                            }
+                            return jsonify(data)
+                else:
+                    if ques:
                         data = {
                             "be_thumbs": be_thumbs,
                             "img_src": lesson.img_src,
@@ -314,13 +491,9 @@ class LessonResource1(Resource):
                             'name': lesson.name,
                             'be_collected': be_collected,
                             'type': lesson.type,
-                            'tools': {
-                                'name': tool.name,
-                                'type': tool.type,
-                                'id': tool.id,
-                                'content': tool.content
-                            },
-                            'passed': 'false',
+                            'tools': [],
+                            'passed': False,
+                            'test': True,
                             'create_at': lesson.create_at,
                             'lesson_permissions': {
                                 'bu': {
@@ -332,38 +505,39 @@ class LessonResource1(Resource):
                             },
                         }
                         return jsonify(data)
-                else:
-                    data = {
-                        "be_thumbs": be_thumbs,
-                        "img_src": lesson.img_src,
-                        'tags': [],
-                        "lecturer": {},
-                        'oprt': {
-                            'id': oper.id,
-                            'name': oper.name,
-                            'cls': {
-                                'id': lescls.id,
-                                'name': lescls.name
-                            }
-                        },
-                        'contents': lesson.content,
-                        'id': lesson.id,
-                        'name': lesson.name,
-                        'be_collected': be_collected,
-                        'type': lesson.type,
-                        'tools': [],
-                        'passed': 'false',
-                        'create_at': lesson.create_at,
-                        'lesson_permissions': {
-                            'bu': {
-                                'name': bu1.name,
-                                'id': bu1.id
+                    else:
+                        data = {
+                            "be_thumbs": be_thumbs,
+                            "img_src": lesson.img_src,
+                            'tags': [],
+                            "lecturer": {},
+                            'oprt': {
+                                'id': oper.id,
+                                'name': oper.name,
+                                'cls': {
+                                    'id': lescls.id,
+                                    'name': lescls.name
+                                }
                             },
-                            "need_manager": 0,
-                            'id': les_permission.id
-                        },
-                    }
-                    return jsonify(data)
+                            'contents': lesson.content,
+                            'id': lesson.id,
+                            'name': lesson.name,
+                            'be_collected': be_collected,
+                            'type': lesson.type,
+                            'tools': [],
+                            'passed': False,
+                            'test': False,
+                            'create_at': lesson.create_at,
+                            'lesson_permissions': {
+                                'bu': {
+                                    'name': bu1.name,
+                                    'id': bu1.id
+                                },
+                                "need_manager": 0,
+                                'id': les_permission.id
+                            },
+                        }
+                        return jsonify(data)
 
     def post(self,id):
         parser = reqparse.RequestParser()
@@ -392,7 +566,6 @@ class LessonResource1(Resource):
             return jsonify({})
 
     def delete(self,id):
-        print(id)
         lesson = Lesson.query.filter(Lesson.id.__eq__(id)).first()
         if lesson:
             db.session.delete(lesson)
@@ -410,13 +583,12 @@ class LessonResource2(Resource):
             bu = BusinessUnit.query.filter(BusinessUnit.id.__eq__(pos.bu_id)).first()
             if bu:
                 les_permissions = LessonPermission.query.filter(LessonPermission.bu_id.__eq__(bu.id)).all()
-                print(les_permissions)
                 if les_permissions:
                     for les_permission in les_permissions:
                         bu2 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(les_permission.bu_id)).first()
                         lessons = Lesson.query.filter(Lesson.oper_id.__eq__(subPart_id),Lesson.id.__eq__(les_permission.lsn_id)).all()
-                        print(lessons)
                         for lesson in lessons:
+                            ques = Question.query.filter(Question.lsn_id == lesson.id).first()
                             if lesson.lecturer_id:
                                 oper = Operation.query.filter(Operation.id.__eq__(lesson.oper_id)).first()
                                 lescls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
@@ -426,395 +598,7 @@ class LessonResource2(Resource):
                                 tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
                                 if tools:
                                     for tool in tools:
-                                        data = {
-                                            "img_src": lesson.img_src,
-                                            'tags': [],
-                                            "lecturer": {
-                                                'name': staff.name,
-                                                'avatar': staff.img_src,
-                                                'lessons': [],
-                                                'pos': {
-                                                    'id': pos1.id,
-                                                    'name': pos1.name,
-                                                    'bu': {
-                                                        'name': bu1.name,
-                                                        'id': bu1.id
-                                                    },
-                                                }
-                                            },
-                                            'oprt': {
-                                                'id': oper.id,
-                                                'name': oper.name,
-                                                'cls': {
-                                                    'id': lescls.id,
-                                                    'name': lescls.name
-                                                }
-                                            },
-                                            'contents': lesson.content,
-                                            'id': lesson.id,
-                                            'name': lesson.name,
-                                            'type': lesson.type,
-                                            'tools': {
-                                                'name': tool.name,
-                                                'type': tool.type,
-                                                'id': tool.id,
-                                                'content': tool.content
-                                            },
-                                            'passed': 'false',
-                                            'create_at': lesson.create_at,
-                                            'lesson_permissions': {
-                                                'bu': {
-                                                    'name': bu2.name,
-                                                    'id': bu2.id
-                                                },
-                                                "need_manager": 0,
-                                                'id': les_permission.id
-                                            },
-                                        }
-                                        list_.append(data)
-                                else:
-                                    data = {
-                                        "img_src": lesson.img_src,
-                                        'tags': [],
-                                        "lecturer": {
-                                            'name': staff.name,
-                                            'avatar': staff.img_src,
-                                            'lessons': [],
-                                            'pos': {
-                                                'id': pos1.id,
-                                                'name': pos1.name,
-                                                'bu': {
-                                                    'name': bu1.name,
-                                                    'id': bu1.id
-                                                },
-                                            }
-                                        },
-                                        'oprt': {
-                                            'id': oper.id,
-                                            'name': oper.name,
-                                            'cls': {
-                                                'id': lescls.id,
-                                                'name': lescls.name
-                                            }
-                                        },
-                                        'contents': lesson.content,
-                                        'id': lesson.id,
-                                        'name': lesson.name,
-                                        'type': lesson.type,
-                                        'tools': [],
-                                        'passed': 'false',
-                                        'create_at': lesson.create_at,
-                                        'lesson_permissions': {
-                                            'bu': {
-                                                'name': bu2.name,
-                                                'id': bu2.id
-                                            },
-                                            "need_manager": 0,
-                                            'id': les_permission.id
-                                        },
-                                    }
-                                    list_.append(data)
-                            else:
-                                tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
-                                if tools:
-                                    for tool in tools:
-                                        data = {
-                                            "img_src": lesson.img_src,
-                                            'tags': [],
-                                            "lecturer": 'null',
-                                            # 'oprt': {
-                                            #     'id': oper.id,
-                                            #     'name': oper.name,
-                                            #     'cls': {
-                                            #         'id': lescls.id,
-                                            #         'name': lescls.name
-                                            #     }
-                                            # },
-                                            'contents': lesson.content,
-                                            'id': lesson.id,
-                                            'name': lesson.name,
-                                            'type': lesson.type,
-                                            'tools': {
-                                                'name': tool.name,
-                                                'type': tool.type,
-                                                'id': tool.id,
-                                                'content': tool.content
-                                            },
-                                            'passed': 'false',
-                                            'create_at': lesson.create_at,
-                                            'lesson_permissions': {
-                                                'bu': {
-                                                    'name': bu2.name,
-                                                    'id': bu2.id
-                                                },
-                                                "need_manager": 0,
-                                                'id': les_permission.id
-                                            },
-                                        }
-                                        list_.append(data)
-                                else:
-                                    data = {
-                                        "img_src": lesson.img_src,
-                                        'tags': [],
-                                        "lecturer": 'null',
-                                        # 'oprt': {
-                                        #     'id': oper.id,
-                                        #     'name': oper.name,
-                                        #     'cls': {
-                                        #         'id': lescls.id,
-                                        #         'name': lescls.name
-                                        #     }
-                                        # },
-                                        'contents': lesson.content,
-                                        'id': lesson.id,
-                                        'name': lesson.name,
-                                        'type': lesson.type,
-                                        'tools': [],
-                                        'passed': 'false',
-                                        'create_at': lesson.create_at,
-                                        'lesson_permissions': {
-                                            'bu': {
-                                                'name': bu2.name,
-                                                'id': bu2.id
-                                            },
-                                            "need_manager": 0,
-                                            'id': les_permission.id
-                                        },
-                                    }
-                                    list_.append(data)
-                    list2 = []
-                    for i in range(len(list_)):
-                        if list_[i] != {}:
-                            re_list = []
-                            re_list.append(list_[i].get('tools'))
-                            for j in range(i + 1, len(list_)):
-                                if list_[i].get('id') == list_[j].get('id'):
-                                    re_list.append(list_[j].get('tools'))
-                                    list_[i]['tools'] = re_list
-                                    list_[j] = {}
-                            if type(list_[i]['tools']) == list:
-                                pass
-                            else:
-                                list_[i]['tools'] = [list_[i]['tools']]
-                            list2.append(list_[i])
-                    return jsonify(list2)
-                else:
-                    return jsonify([])
-            else:
-                return jsonify([])
-
-        elif types == 'dealer':
-            list_ = []
-            admin = Admin.query.filter(Admin.openid.__eq__(openid)).first()
-            user = User.query.filter(User.openid.__eq__(openid)).first()
-            if admin:
-                les_permissions = LessonPermission.query.filter(LessonPermission.bu_id.__eq__(admin.bu_id)).all()
-                for les_permission in les_permissions:
-                    bu2 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(les_permission.bu_id)).first()
-                    lessons = Lesson.query.filter(Lesson.oper_id.__eq__(subPart_id),Lesson.id.__eq__(les_permission.lsn_id)).all()
-                    for lesson in lessons:
-                        if lesson.is_look == 1:
-                            if lesson.lecturer_id:
-                                oper = Operation.query.filter(Operation.id.__eq__(lesson.oper_id)).first()
-                                lescls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
-                                staff = User.query.filter(User.id.__eq__(lesson.lecturer_id)).first()
-                                pos1 = Position.query.filter(Position.id.__eq__(staff.pos_id)).first()
-                                bu1 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(pos1.bu_id)).first()
-                                tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
-                                if tools:
-                                    for tool in tools:
-                                        data = {
-                                            "img_src": lesson.img_src,
-                                            'tags': [],
-                                            "lecturer": {
-                                                'name': staff.name,
-                                                'avatar': staff.img_src,
-                                                'lessons': [],
-                                                'pos': {
-                                                    'id': pos1.id,
-                                                    'name': pos1.name,
-                                                    'bu': {
-                                                        'name': bu1.name,
-                                                        'id': bu1.id
-                                                    },
-                                                }
-                                            },
-                                            'oprt': {
-                                                'id': oper.id,
-                                                'name': oper.name,
-                                                'cls': {
-                                                    'id': lescls.id,
-                                                    'name': lescls.name
-                                                }
-                                            },
-                                            'contents': lesson.content,
-                                            'id': lesson.id,
-                                            'name': lesson.name,
-                                            'type': lesson.type,
-                                            'tools': {
-                                                'name': tool.name,
-                                                'type': tool.type,
-                                                'id': tool.id,
-                                                'content': tool.content
-                                            },
-                                            'passed': 'false',
-                                            'create_at': lesson.create_at,
-                                            'lesson_permissions': {
-                                                'bu': {
-                                                    'name': bu2.name,
-                                                    'id': bu2.id
-                                                },
-                                                "need_manager": 0,
-                                                'id': les_permission.id
-                                            },
-                                        }
-                                        list_.append(data)
-                                else:
-                                    data = {
-                                        "img_src": lesson.img_src,
-                                        'tags': [],
-                                        "lecturer": {
-                                            'name': staff.name,
-                                            'avatar': staff.img_src,
-                                            'lessons': [],
-                                            'pos': {
-                                                'id': pos1.id,
-                                                'name': pos1.name,
-                                                'bu': {
-                                                    'name': bu1.name,
-                                                    'id': bu1.id
-                                                },
-                                            }
-                                        },
-                                        'oprt': {
-                                            'id': oper.id,
-                                            'name': oper.name,
-                                            'cls': {
-                                                'id': lescls.id,
-                                                'name': lescls.name
-                                            }
-                                        },
-                                        'contents': lesson.content,
-                                        'id': lesson.id,
-                                        'name': lesson.name,
-                                        'type': lesson.type,
-                                        'tools': [],
-                                        'passed': 'false',
-                                        'create_at': lesson.create_at,
-                                        'lesson_permissions': {
-                                            'bu': {
-                                                'name': bu2.name,
-                                                'id': bu2.id
-                                            },
-                                            "need_manager": 0,
-                                            'id': les_permission.id
-                                        },
-                                    }
-                                    list_.append(data)
-                            else:
-                                tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
-                                if tools:
-                                    for tool in tools:
-                                        data = {
-                                            "img_src": lesson.img_src,
-                                            'tags': [],
-                                            "lecturer": 'null',
-                                            # 'oprt': {
-                                            #     'id': oper.id,
-                                            #     'name': oper.name,
-                                            #     'cls': {
-                                            #         'id': lescls.id,
-                                            #         'name': lescls.name
-                                            #     }
-                                            # },
-                                            'contents': lesson.content,
-                                            'id': lesson.id,
-                                            'name': lesson.name,
-                                            'type': lesson.type,
-                                            'tools': {
-                                                'name': tool.name,
-                                                'type': tool.type,
-                                                'id': tool.id,
-                                                'content': tool.content
-                                            },
-                                            'passed': 'false',
-                                            'create_at': lesson.create_at,
-                                            'lesson_permissions': {
-                                                'bu': {
-                                                    'name': bu2.name,
-                                                    'id': bu2.id
-                                                },
-                                                "need_manager": 0,
-                                                'id': les_permission.id
-                                            },
-                                        }
-                                        list_.append(data)
-                                else:
-                                    data = {
-                                        "img_src": lesson.img_src,
-                                        'tags': [],
-                                        "lecturer": 'null',
-                                        # 'oprt': {
-                                        #     'id': oper.id,
-                                        #     'name': oper.name,
-                                        #     'cls': {
-                                        #         'id': lescls.id,
-                                        #         'name': lescls.name
-                                        #     }
-                                        # },
-                                        'contents': lesson.content,
-                                        'id': lesson.id,
-                                        'name': lesson.name,
-                                        'type': lesson.type,
-                                        'tools': [],
-                                        'passed': 'false',
-                                        'create_at': lesson.create_at,
-                                        'lesson_permissions': {
-                                            'bu': {
-                                                'name': bu2.name,
-                                                'id': bu2.id
-                                            },
-                                            "need_manager": 0,
-                                            'id': les_permission.id
-                                        },
-                                    }
-                                    list_.append(data)
-                list2 = []
-                for i in range(len(list_)):
-                    if list_[i] != {}:
-                        re_list = []
-                        re_list.append(list_[i].get('tools'))
-                        for j in range(i + 1, len(list_)):
-                            if list_[i].get('id') == list_[j].get('id'):
-                                re_list.append(list_[j].get('tools'))
-                                list_[i]['tools'] = re_list
-                                list_[j] = {}
-                        if type(list_[i]['tools']) == list:
-                            pass
-                        else:
-                            list_[i]['tools'] = [list_[i]['tools']]
-                        list2.append(list_[i])
-                return jsonify(list2)
-            elif user:
-                pos = Position.query.filter(Position.id.__eq__(user.pos_id)).first()
-                bu = BusinessUnit.query.filter(BusinessUnit.id.__eq__(pos.bu_id)).first()
-                if bu:
-                    les_permissions = LessonPermission.query.filter(LessonPermission.bu_id.__eq__(bu.id)).all()
-                    if les_permissions:
-                        for les_permission in les_permissions:
-                            bu2 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(les_permission.bu_id)).first()
-                            lessons = Lesson.query.filter(Lesson.oper_id.__eq__(subPart_id),
-                                                          Lesson.id.__eq__(les_permission.lsn_id)).all()
-                            for lesson in lessons:
-                                if lesson.lecturer_id:
-                                    oper = Operation.query.filter(Operation.id.__eq__(lesson.oper_id)).first()
-                                    lescls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
-                                    staff = User.query.filter(User.id.__eq__(lesson.lecturer_id)).first()
-                                    pos1 = Position.query.filter(Position.id.__eq__(staff.pos_id)).first()
-                                    bu1 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(pos1.bu_id)).first()
-                                    tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
-                                    if tools:
-                                        for tool in tools:
+                                        if ques:
                                             data = {
                                                 "img_src": lesson.img_src,
                                                 'tags': [],
@@ -849,7 +633,8 @@ class LessonResource2(Resource):
                                                     'id': tool.id,
                                                     'content': tool.content
                                                 },
-                                                'passed': 'false',
+                                                'passed': False,
+                                                'test': True,
                                                 'create_at': lesson.create_at,
                                                 'lesson_permissions': {
                                                     'bu': {
@@ -861,6 +646,98 @@ class LessonResource2(Resource):
                                                 },
                                             }
                                             list_.append(data)
+                                        else:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": {
+                                                    'name': staff.name,
+                                                    'avatar': staff.img_src,
+                                                    'lessons': [],
+                                                    'pos': {
+                                                        'id': pos1.id,
+                                                        'name': pos1.name,
+                                                        'bu': {
+                                                            'name': bu1.name,
+                                                            'id': bu1.id
+                                                        },
+                                                    }
+                                                },
+                                                'oprt': {
+                                                    'id': oper.id,
+                                                    'name': oper.name,
+                                                    'cls': {
+                                                        'id': lescls.id,
+                                                        'name': lescls.name
+                                                    }
+                                                },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': {
+                                                    'name': tool.name,
+                                                    'type': tool.type,
+                                                    'id': tool.id,
+                                                    'content': tool.content
+                                                },
+                                                'passed': False,
+                                                'test': False,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                else:
+                                    if ques:
+                                        data = {
+                                            "img_src": lesson.img_src,
+                                            'tags': [],
+                                            "lecturer": {
+                                                'name': staff.name,
+                                                'avatar': staff.img_src,
+                                                'lessons': [],
+                                                'pos': {
+                                                    'id': pos1.id,
+                                                    'name': pos1.name,
+                                                    'bu': {
+                                                        'name': bu1.name,
+                                                        'id': bu1.id
+                                                    },
+                                                }
+                                            },
+                                            'oprt': {
+                                                'id': oper.id,
+                                                'name': oper.name,
+                                                'cls': {
+                                                    'id': lescls.id,
+                                                    'name': lescls.name
+                                                }
+                                            },
+                                            'contents': lesson.content,
+                                            'id': lesson.id,
+                                            'name': lesson.name,
+                                            'type': lesson.type,
+                                            'tools': [],
+                                            'passed': False,
+                                            'test': True,
+                                            'create_at': lesson.create_at,
+                                            'lesson_permissions': {
+                                                'bu': {
+                                                    'name': bu2.name,
+                                                    'id': bu2.id
+                                                },
+                                                "need_manager": 0,
+                                                'id': les_permission.id
+                                            },
+                                        }
+                                        list_.append(data)
                                     else:
                                         data = {
                                             "img_src": lesson.img_src,
@@ -891,7 +768,8 @@ class LessonResource2(Resource):
                                             'name': lesson.name,
                                             'type': lesson.type,
                                             'tools': [],
-                                            'passed': 'false',
+                                            'passed': False,
+                                            'test': False,
                                             'create_at': lesson.create_at,
                                             'lesson_permissions': {
                                                 'bu': {
@@ -903,10 +781,11 @@ class LessonResource2(Resource):
                                             },
                                         }
                                         list_.append(data)
-                                else:
-                                    tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
-                                    if tools:
-                                        for tool in tools:
+                            else:
+                                tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
+                                if tools:
+                                    for tool in tools:
+                                        if ques:
                                             data = {
                                                 "img_src": lesson.img_src,
                                                 'tags': [],
@@ -929,7 +808,8 @@ class LessonResource2(Resource):
                                                     'id': tool.id,
                                                     'content': tool.content
                                                 },
-                                                'passed': 'false',
+                                                'passed': False,
+                                                'test': True,
                                                 'create_at': lesson.create_at,
                                                 'lesson_permissions': {
                                                     'bu': {
@@ -941,6 +821,443 @@ class LessonResource2(Resource):
                                                 },
                                             }
                                             list_.append(data)
+                                        else:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": 'null',
+                                                # 'oprt': {
+                                                #     'id': oper.id,
+                                                #     'name': oper.name,
+                                                #     'cls': {
+                                                #         'id': lescls.id,
+                                                #         'name': lescls.name
+                                                #     }
+                                                # },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': {
+                                                    'name': tool.name,
+                                                    'type': tool.type,
+                                                    'id': tool.id,
+                                                    'content': tool.content
+                                                },
+                                                'passed': False,
+                                                'test': False,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                else:
+                                    if ques:
+                                        data = {
+                                            "img_src": lesson.img_src,
+                                            'tags': [],
+                                            "lecturer": 'null',
+                                            # 'oprt': {
+                                            #     'id': oper.id,
+                                            #     'name': oper.name,
+                                            #     'cls': {
+                                            #         'id': lescls.id,
+                                            #         'name': lescls.name
+                                            #     }
+                                            # },
+                                            'contents': lesson.content,
+                                            'id': lesson.id,
+                                            'name': lesson.name,
+                                            'type': lesson.type,
+                                            'tools': [],
+                                            'passed': False,
+                                            'test': True,
+                                            'create_at': lesson.create_at,
+                                            'lesson_permissions': {
+                                                'bu': {
+                                                    'name': bu2.name,
+                                                    'id': bu2.id
+                                                },
+                                                "need_manager": 0,
+                                                'id': les_permission.id
+                                            },
+                                        }
+                                        list_.append(data)
+                                    else:
+                                        data = {
+                                            "img_src": lesson.img_src,
+                                            'tags': [],
+                                            "lecturer": 'null',
+                                            # 'oprt': {
+                                            #     'id': oper.id,
+                                            #     'name': oper.name,
+                                            #     'cls': {
+                                            #         'id': lescls.id,
+                                            #         'name': lescls.name
+                                            #     }
+                                            # },
+                                            'contents': lesson.content,
+                                            'id': lesson.id,
+                                            'name': lesson.name,
+                                            'type': lesson.type,
+                                            'tools': {
+                                                'name': tool.name,
+                                                'type': tool.type,
+                                                'id': tool.id,
+                                                'content': tool.content
+                                            },
+                                            'passed': False,
+                                            'test': False,
+                                            'create_at': lesson.create_at,
+                                            'lesson_permissions': {
+                                                'bu': {
+                                                    'name': bu2.name,
+                                                    'id': bu2.id
+                                                },
+                                                "need_manager": 0,
+                                                'id': les_permission.id
+                                            },
+                                        }
+                                        list_.append(data)
+                    list2 = []
+                    for i in range(len(list_)):
+                        if list_[i] != {}:
+                            re_list = []
+                            re_list.append(list_[i].get('tools'))
+                            for j in range(i + 1, len(list_)):
+                                if list_[i].get('id') == list_[j].get('id'):
+                                    re_list.append(list_[j].get('tools'))
+                                    list_[i]['tools'] = re_list
+                                    list_[j] = {}
+                            if type(list_[i]['tools']) == list:
+                                pass
+                            else:
+                                list_[i]['tools'] = [list_[i]['tools']]
+                            list2.append(list_[i])
+                    return jsonify(list2)
+                else:
+                    return jsonify([])
+            else:
+                return jsonify([])
+
+        elif types == 'dealer':
+            list_ = []
+            admin = Admin.query.filter(Admin.openid.__eq__(openid)).first()
+            user = User.query.filter(User.openid.__eq__(openid)).first()
+            if admin:
+                les_permissions = LessonPermission.query.filter(LessonPermission.bu_id.__eq__(admin.bu_id)).all()
+                for les_permission in les_permissions:
+                    bu2 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(les_permission.bu_id)).first()
+                    lessons = Lesson.query.filter(Lesson.oper_id.__eq__(subPart_id),Lesson.id.__eq__(les_permission.lsn_id)).all()
+                    for lesson in lessons:
+                        ques = Question.query.filter(Question.lsn_id == lesson.id).first()
+                        if lesson.is_look == 1:
+                            if lesson.lecturer_id:
+                                oper = Operation.query.filter(Operation.id.__eq__(lesson.oper_id)).first()
+                                lescls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
+                                staff = User.query.filter(User.id.__eq__(lesson.lecturer_id)).first()
+                                pos1 = Position.query.filter(Position.id.__eq__(staff.pos_id)).first()
+                                bu1 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(pos1.bu_id)).first()
+                                tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
+                                if tools:
+                                    for tool in tools:
+                                        if ques:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": {
+                                                    'name': staff.name,
+                                                    'avatar': staff.img_src,
+                                                    'lessons': [],
+                                                    'pos': {
+                                                        'id': pos1.id,
+                                                        'name': pos1.name,
+                                                        'bu': {
+                                                            'name': bu1.name,
+                                                            'id': bu1.id
+                                                        },
+                                                    }
+                                                },
+                                                'oprt': {
+                                                    'id': oper.id,
+                                                    'name': oper.name,
+                                                    'cls': {
+                                                        'id': lescls.id,
+                                                        'name': lescls.name
+                                                    }
+                                                },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': {
+                                                    'name': tool.name,
+                                                    'type': tool.type,
+                                                    'id': tool.id,
+                                                    'content': tool.content
+                                                },
+                                                'passed': False,
+                                                'test': True,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                        else:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": {
+                                                    'name': staff.name,
+                                                    'avatar': staff.img_src,
+                                                    'lessons': [],
+                                                    'pos': {
+                                                        'id': pos1.id,
+                                                        'name': pos1.name,
+                                                        'bu': {
+                                                            'name': bu1.name,
+                                                            'id': bu1.id
+                                                        },
+                                                    }
+                                                },
+                                                'oprt': {
+                                                    'id': oper.id,
+                                                    'name': oper.name,
+                                                    'cls': {
+                                                        'id': lescls.id,
+                                                        'name': lescls.name
+                                                    }
+                                                },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': {
+                                                    'name': tool.name,
+                                                    'type': tool.type,
+                                                    'id': tool.id,
+                                                    'content': tool.content
+                                                },
+                                                'passed': False,
+                                                'test': False,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                else:
+                                    if ques:
+                                        data = {
+                                            "img_src": lesson.img_src,
+                                            'tags': [],
+                                            "lecturer": {
+                                                'name': staff.name,
+                                                'avatar': staff.img_src,
+                                                'lessons': [],
+                                                'pos': {
+                                                    'id': pos1.id,
+                                                    'name': pos1.name,
+                                                    'bu': {
+                                                        'name': bu1.name,
+                                                        'id': bu1.id
+                                                    },
+                                                }
+                                            },
+                                            'oprt': {
+                                                'id': oper.id,
+                                                'name': oper.name,
+                                                'cls': {
+                                                    'id': lescls.id,
+                                                    'name': lescls.name
+                                                }
+                                            },
+                                            'contents': lesson.content,
+                                            'id': lesson.id,
+                                            'name': lesson.name,
+                                            'type': lesson.type,
+                                            'tools': [],
+                                            'passed': False,
+                                            'test': True,
+                                            'create_at': lesson.create_at,
+                                            'lesson_permissions': {
+                                                'bu': {
+                                                    'name': bu2.name,
+                                                    'id': bu2.id
+                                                },
+                                                "need_manager": 0,
+                                                'id': les_permission.id
+                                            },
+                                        }
+                                        list_.append(data)
+                                    else:
+                                        data = {
+                                            "img_src": lesson.img_src,
+                                            'tags': [],
+                                            "lecturer": {
+                                                'name': staff.name,
+                                                'avatar': staff.img_src,
+                                                'lessons': [],
+                                                'pos': {
+                                                    'id': pos1.id,
+                                                    'name': pos1.name,
+                                                    'bu': {
+                                                        'name': bu1.name,
+                                                        'id': bu1.id
+                                                    },
+                                                }
+                                            },
+                                            'oprt': {
+                                                'id': oper.id,
+                                                'name': oper.name,
+                                                'cls': {
+                                                    'id': lescls.id,
+                                                    'name': lescls.name
+                                                }
+                                            },
+                                            'contents': lesson.content,
+                                            'id': lesson.id,
+                                            'name': lesson.name,
+                                            'type': lesson.type,
+                                            'tools': [],
+                                            'passed': False,
+                                            'test': True,
+                                            'create_at': lesson.create_at,
+                                            'lesson_permissions': {
+                                                'bu': {
+                                                    'name': bu2.name,
+                                                    'id': bu2.id
+                                                },
+                                                "need_manager": 0,
+                                                'id': les_permission.id
+                                            },
+                                        }
+                                        list_.append(data)
+                            else:
+                                tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
+                                if tools:
+                                    for tool in tools:
+                                        if ques:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": 'null',
+                                                # 'oprt': {
+                                                #     'id': oper.id,
+                                                #     'name': oper.name,
+                                                #     'cls': {
+                                                #         'id': lescls.id,
+                                                #         'name': lescls.name
+                                                #     }
+                                                # },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': {
+                                                    'name': tool.name,
+                                                    'type': tool.type,
+                                                    'id': tool.id,
+                                                    'content': tool.content
+                                                },
+                                                'passed': False,
+                                                'test': True,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                        else:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": 'null',
+                                                # 'oprt': {
+                                                #     'id': oper.id,
+                                                #     'name': oper.name,
+                                                #     'cls': {
+                                                #         'id': lescls.id,
+                                                #         'name': lescls.name
+                                                #     }
+                                                # },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': {
+                                                    'name': tool.name,
+                                                    'type': tool.type,
+                                                    'id': tool.id,
+                                                    'content': tool.content
+                                                },
+                                                'passed': False,
+                                                'test': False,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                else:
+                                    if ques:
+                                        data = {
+                                            "img_src": lesson.img_src,
+                                            'tags': [],
+                                            "lecturer": 'null',
+                                            # 'oprt': {
+                                            #     'id': oper.id,
+                                            #     'name': oper.name,
+                                            #     'cls': {
+                                            #         'id': lescls.id,
+                                            #         'name': lescls.name
+                                            #     }
+                                            # },
+                                            'contents': lesson.content,
+                                            'id': lesson.id,
+                                            'name': lesson.name,
+                                            'type': lesson.type,
+                                            'tools': [],
+                                            'passed': False,
+                                            'test': True,
+                                            'create_at': lesson.create_at,
+                                            'lesson_permissions': {
+                                                'bu': {
+                                                    'name': bu2.name,
+                                                    'id': bu2.id
+                                                },
+                                                "need_manager": 0,
+                                                'id': les_permission.id
+                                            },
+                                        }
+                                        list_.append(data)
                                     else:
                                         data = {
                                             "img_src": lesson.img_src,
@@ -959,7 +1276,8 @@ class LessonResource2(Resource):
                                             'name': lesson.name,
                                             'type': lesson.type,
                                             'tools': [],
-                                            'passed': 'false',
+                                            'passed': False,
+                                            'test': False,
                                             'create_at': lesson.create_at,
                                             'lesson_permissions': {
                                                 'bu': {
@@ -971,6 +1289,365 @@ class LessonResource2(Resource):
                                             },
                                         }
                                         list_.append(data)
+                list2 = []
+                for i in range(len(list_)):
+                    if list_[i] != {}:
+                        re_list = []
+                        re_list.append(list_[i].get('tools'))
+                        for j in range(i + 1, len(list_)):
+                            if list_[i].get('id') == list_[j].get('id'):
+                                re_list.append(list_[j].get('tools'))
+                                list_[i]['tools'] = re_list
+                                list_[j] = {}
+                        if type(list_[i]['tools']) == list:
+                            pass
+                        else:
+                            list_[i]['tools'] = [list_[i]['tools']]
+                        list2.append(list_[i])
+                return jsonify(list2)
+            elif user:
+                pos = Position.query.filter(Position.id.__eq__(user.pos_id)).first()
+                bu = BusinessUnit.query.filter(BusinessUnit.id.__eq__(pos.bu_id)).first()
+                if bu:
+                    les_permissions = LessonPermission.query.filter(LessonPermission.bu_id.__eq__(bu.id)).all()
+                    if les_permissions:
+                        for les_permission in les_permissions:
+                            bu2 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(les_permission.bu_id)).first()
+                            lessons = Lesson.query.filter(Lesson.oper_id.__eq__(subPart_id),
+                                                          Lesson.id.__eq__(les_permission.lsn_id)).all()
+                            for lesson in lessons:
+                                ques = Question.query.filter(Question.lsn_id == lesson.id).first()
+                                if lesson.lecturer_id:
+                                    oper = Operation.query.filter(Operation.id.__eq__(lesson.oper_id)).first()
+                                    lescls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
+                                    staff = User.query.filter(User.id.__eq__(lesson.lecturer_id)).first()
+                                    pos1 = Position.query.filter(Position.id.__eq__(staff.pos_id)).first()
+                                    bu1 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(pos1.bu_id)).first()
+                                    tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
+                                    if tools:
+                                        for tool in tools:
+                                            if ques:
+                                                data = {
+                                                    "img_src": lesson.img_src,
+                                                    'tags': [],
+                                                    "lecturer": {
+                                                        'name': staff.name,
+                                                        'avatar': staff.img_src,
+                                                        'lessons': [],
+                                                        'pos': {
+                                                            'id': pos1.id,
+                                                            'name': pos1.name,
+                                                            'bu': {
+                                                                'name': bu1.name,
+                                                                'id': bu1.id
+                                                            },
+                                                        }
+                                                    },
+                                                    'oprt': {
+                                                        'id': oper.id,
+                                                        'name': oper.name,
+                                                        'cls': {
+                                                            'id': lescls.id,
+                                                            'name': lescls.name
+                                                        }
+                                                    },
+                                                    'contents': lesson.content,
+                                                    'id': lesson.id,
+                                                    'name': lesson.name,
+                                                    'type': lesson.type,
+                                                    'tools': {
+                                                        'name': tool.name,
+                                                        'type': tool.type,
+                                                        'id': tool.id,
+                                                        'content': tool.content
+                                                    },
+                                                    'passed': False,
+                                                    'test': True,
+                                                    'create_at': lesson.create_at,
+                                                    'lesson_permissions': {
+                                                        'bu': {
+                                                            'name': bu2.name,
+                                                            'id': bu2.id
+                                                        },
+                                                        "need_manager": 0,
+                                                        'id': les_permission.id
+                                                    },
+                                                }
+                                                list_.append(data)
+                                            else:
+                                                data = {
+                                                    "img_src": lesson.img_src,
+                                                    'tags': [],
+                                                    "lecturer": {
+                                                        'name': staff.name,
+                                                        'avatar': staff.img_src,
+                                                        'lessons': [],
+                                                        'pos': {
+                                                            'id': pos1.id,
+                                                            'name': pos1.name,
+                                                            'bu': {
+                                                                'name': bu1.name,
+                                                                'id': bu1.id
+                                                            },
+                                                        }
+                                                    },
+                                                    'oprt': {
+                                                        'id': oper.id,
+                                                        'name': oper.name,
+                                                        'cls': {
+                                                            'id': lescls.id,
+                                                            'name': lescls.name
+                                                        }
+                                                    },
+                                                    'contents': lesson.content,
+                                                    'id': lesson.id,
+                                                    'name': lesson.name,
+                                                    'type': lesson.type,
+                                                    'tools': {
+                                                        'name': tool.name,
+                                                        'type': tool.type,
+                                                        'id': tool.id,
+                                                        'content': tool.content
+                                                    },
+                                                    'passed': False,
+                                                    'test': False,
+                                                    'create_at': lesson.create_at,
+                                                    'lesson_permissions': {
+                                                        'bu': {
+                                                            'name': bu2.name,
+                                                            'id': bu2.id
+                                                        },
+                                                        "need_manager": 0,
+                                                        'id': les_permission.id
+                                                    },
+                                                }
+                                                list_.append(data)
+                                    else:
+                                        if ques:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": {
+                                                    'name': staff.name,
+                                                    'avatar': staff.img_src,
+                                                    'lessons': [],
+                                                    'pos': {
+                                                        'id': pos1.id,
+                                                        'name': pos1.name,
+                                                        'bu': {
+                                                            'name': bu1.name,
+                                                            'id': bu1.id
+                                                        },
+                                                    }
+                                                },
+                                                'oprt': {
+                                                    'id': oper.id,
+                                                    'name': oper.name,
+                                                    'cls': {
+                                                        'id': lescls.id,
+                                                        'name': lescls.name
+                                                    }
+                                                },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': [],
+                                                'passed': False,
+                                                'test': True,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                        else:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": {
+                                                    'name': staff.name,
+                                                    'avatar': staff.img_src,
+                                                    'lessons': [],
+                                                    'pos': {
+                                                        'id': pos1.id,
+                                                        'name': pos1.name,
+                                                        'bu': {
+                                                            'name': bu1.name,
+                                                            'id': bu1.id
+                                                        },
+                                                    }
+                                                },
+                                                'oprt': {
+                                                    'id': oper.id,
+                                                    'name': oper.name,
+                                                    'cls': {
+                                                        'id': lescls.id,
+                                                        'name': lescls.name
+                                                    }
+                                                },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': [],
+                                                'passed': False,
+                                                'test': False,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                else:
+                                    tools = Tool.query.filter(Tool.lsn_id.__eq__(lesson.id)).all()
+                                    if tools:
+                                        for tool in tools:
+                                            if ques:
+                                                data = {
+                                                    "img_src": lesson.img_src,
+                                                    'tags': [],
+                                                    "lecturer": 'null',
+                                                    # 'oprt': {
+                                                    #     'id': oper.id,
+                                                    #     'name': oper.name,
+                                                    #     'cls': {
+                                                    #         'id': lescls.id,
+                                                    #         'name': lescls.name
+                                                    #     }
+                                                    # },
+                                                    'contents': lesson.content,
+                                                    'id': lesson.id,
+                                                    'name': lesson.name,
+                                                    'type': lesson.type,
+                                                    'tools': {
+                                                        'name': tool.name,
+                                                        'type': tool.type,
+                                                        'id': tool.id,
+                                                        'content': tool.content
+                                                    },
+                                                    'passed': False,
+                                                    'test': True,
+                                                    'create_at': lesson.create_at,
+                                                    'lesson_permissions': {
+                                                        'bu': {
+                                                            'name': bu2.name,
+                                                            'id': bu2.id
+                                                        },
+                                                        "need_manager": 0,
+                                                        'id': les_permission.id
+                                                    },
+                                                }
+                                                list_.append(data)
+                                            else:
+                                                data = {
+                                                    "img_src": lesson.img_src,
+                                                    'tags': [],
+                                                    "lecturer": 'null',
+                                                    # 'oprt': {
+                                                    #     'id': oper.id,
+                                                    #     'name': oper.name,
+                                                    #     'cls': {
+                                                    #         'id': lescls.id,
+                                                    #         'name': lescls.name
+                                                    #     }
+                                                    # },
+                                                    'contents': lesson.content,
+                                                    'id': lesson.id,
+                                                    'name': lesson.name,
+                                                    'type': lesson.type,
+                                                    'tools': {
+                                                        'name': tool.name,
+                                                        'type': tool.type,
+                                                        'id': tool.id,
+                                                        'content': tool.content
+                                                    },
+                                                    'passed': False,
+                                                    'test': False,
+                                                    'create_at': lesson.create_at,
+                                                    'lesson_permissions': {
+                                                        'bu': {
+                                                            'name': bu2.name,
+                                                            'id': bu2.id
+                                                        },
+                                                        "need_manager": 0,
+                                                        'id': les_permission.id
+                                                    },
+                                                }
+                                                list_.append(data)
+                                    else:
+                                        if ques:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": 'null',
+                                                # 'oprt': {
+                                                #     'id': oper.id,
+                                                #     'name': oper.name,
+                                                #     'cls': {
+                                                #         'id': lescls.id,
+                                                #         'name': lescls.name
+                                                #     }
+                                                # },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': [],
+                                                'passed': False,
+                                                'test': True,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
+                                        else:
+                                            data = {
+                                                "img_src": lesson.img_src,
+                                                'tags': [],
+                                                "lecturer": 'null',
+                                                # 'oprt': {
+                                                #     'id': oper.id,
+                                                #     'name': oper.name,
+                                                #     'cls': {
+                                                #         'id': lescls.id,
+                                                #         'name': lescls.name
+                                                #     }
+                                                # },
+                                                'contents': lesson.content,
+                                                'id': lesson.id,
+                                                'name': lesson.name,
+                                                'type': lesson.type,
+                                                'tools': [],
+                                                'passed': False,
+                                                'test': False,
+                                                'create_at': lesson.create_at,
+                                                'lesson_permissions': {
+                                                    'bu': {
+                                                        'name': bu2.name,
+                                                        'id': bu2.id
+                                                    },
+                                                    "need_manager": 0,
+                                                    'id': les_permission.id
+                                                },
+                                            }
+                                            list_.append(data)
                     list2 = []
                     for i in range(len(list_)):
                         if list_[i] != {}:
@@ -1006,6 +1683,7 @@ class LessonResource3(Resource):
                 bu1 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(les_permission.bu_id)).first()
                 lessons = Lesson.query.filter(Lesson.id.__eq__(les_permission.lsn_id),Lesson.recommended.__eq__(1)).all()
                 for lesson in lessons:
+                    ques = Question.query.filter(Question.lsn_id == lesson.id).first()
                     if lesson.lecturer_id:
                         oper = Operation.query.filter(Operation.id.__eq__(lesson.oper_id)).first()
                         lescls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
@@ -1016,48 +1694,94 @@ class LessonResource3(Resource):
                         lsn_collects = LessonCollection.query.filter(LessonCollection.staff_id.__eq__(user_id)).all()
                         for lsn_collect in lsn_collects:
                             be_collected.append(lsn_collect.staff_id)
-                        data = {
-                            "be_thumbs": be_thumbs,
-                            "img_src": lesson.img_src,
-                            'tags': [],
-                            "lecturer": {
-                                'name': staff.name,
-                                'avatar': staff.img_src,
-                                'lessons': [],
-                                'pos': {
-                                    'id': pos.id,
-                                    'name': pos.name,
-                                    'bu': {
-                                        'name': bu.name,
-                                        'id': bu.id
-                                    },
-                                }
-                            },
-                            'oprt': {
-                                'id': oper.id,
-                                'name': oper.name,
-                                'cls': {
-                                    'id': lescls.id,
-                                    'name': lescls.name
-                                }
-                            },
-                            'contents': lesson.content,
-                            'id': lesson.id,
-                            'name': lesson.name,
-                            'be_collected': be_collected,
-                            'type': lesson.type,
-                            'passed': 'false',
-                            'create_at': lesson.create_at,
-                            'lesson_permissions': {
-                                'bu': {
-                                    'name': bu1.name,
-                                    'id': bu1.id
+                        if ques:
+                            data = {
+                                "be_thumbs": be_thumbs,
+                                "img_src": lesson.img_src,
+                                'tags': [],
+                                "lecturer": {
+                                    'name': staff.name,
+                                    'avatar': staff.img_src,
+                                    'lessons': [],
+                                    'pos': {
+                                        'id': pos.id,
+                                        'name': pos.name,
+                                        'bu': {
+                                            'name': bu.name,
+                                            'id': bu.id
+                                        },
+                                    }
                                 },
-                                "need_manager": 0,
-                                'id': les_permission.id
-                            },
-                        }
-                        list1.append(data)
+                                'oprt': {
+                                    'id': oper.id,
+                                    'name': oper.name,
+                                    'cls': {
+                                        'id': lescls.id,
+                                        'name': lescls.name
+                                    }
+                                },
+                                'contents': lesson.content,
+                                'id': lesson.id,
+                                'name': lesson.name,
+                                'be_collected': be_collected,
+                                'type': lesson.type,
+                                'passed': False,
+                                'test': True,
+                                'create_at': lesson.create_at,
+                                'lesson_permissions': {
+                                    'bu': {
+                                        'name': bu1.name,
+                                        'id': bu1.id
+                                    },
+                                    "need_manager": 0,
+                                    'id': les_permission.id
+                                },
+                            }
+                            list1.append(data)
+                        else:
+                            data = {
+                                "be_thumbs": be_thumbs,
+                                "img_src": lesson.img_src,
+                                'tags': [],
+                                "lecturer": {
+                                    'name': staff.name,
+                                    'avatar': staff.img_src,
+                                    'lessons': [],
+                                    'pos': {
+                                        'id': pos.id,
+                                        'name': pos.name,
+                                        'bu': {
+                                            'name': bu.name,
+                                            'id': bu.id
+                                        },
+                                    }
+                                },
+                                'oprt': {
+                                    'id': oper.id,
+                                    'name': oper.name,
+                                    'cls': {
+                                        'id': lescls.id,
+                                        'name': lescls.name
+                                    }
+                                },
+                                'contents': lesson.content,
+                                'id': lesson.id,
+                                'name': lesson.name,
+                                'be_collected': be_collected,
+                                'type': lesson.type,
+                                'passed': False,
+                                'test': False,
+                                'create_at': lesson.create_at,
+                                'lesson_permissions': {
+                                    'bu': {
+                                        'name': bu1.name,
+                                        'id': bu1.id
+                                    },
+                                    "need_manager": 0,
+                                    'id': les_permission.id
+                                },
+                            }
+                            list1.append(data)
                     else:
                         oper = Operation.query.filter(Operation.id.__eq__(lesson.oper_id)).first()
                         lescls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
@@ -1067,36 +1791,70 @@ class LessonResource3(Resource):
                         lsn_collects = LessonCollection.query.filter(LessonCollection.staff_id.__eq__(user_id)).all()
                         for lsn_collect in lsn_collects:
                             be_collected.append(lsn_collect.staff_id)
-                        data = {
-                            "be_thumbs": be_thumbs,
-                            "img_src": lesson.img_src,
-                            'tags': [],
-                            "lecturer": {},
-                            'oprt': {
-                                'id': oper.id,
-                                'name': oper.name,
-                                'cls': {
-                                    'id': lescls.id,
-                                    'name': lescls.name
-                                }
-                            },
-                            'contents': lesson.content,
-                            'id': lesson.id,
-                            'name': lesson.name,
-                            'be_collected': be_collected,
-                            'type': lesson.type,
-                            'passed': 'false',
-                            'create_at': lesson.create_at,
-                            'lesson_permissions': {
-                                'bu': {
-                                    'name': bu1.name,
-                                    'id': bu1.id
+                        if ques:
+                            data = {
+                                "be_thumbs": be_thumbs,
+                                "img_src": lesson.img_src,
+                                'tags': [],
+                                "lecturer": {},
+                                'oprt': {
+                                    'id': oper.id,
+                                    'name': oper.name,
+                                    'cls': {
+                                        'id': lescls.id,
+                                        'name': lescls.name
+                                    }
                                 },
-                                "need_manager": 0,
-                                'id': les_permission.id
-                            },
-                        }
-                        list1.append(data)
+                                'contents': lesson.content,
+                                'id': lesson.id,
+                                'name': lesson.name,
+                                'be_collected': be_collected,
+                                'type': lesson.type,
+                                'passed': False,
+                                'test': True,
+                                'create_at': lesson.create_at,
+                                'lesson_permissions': {
+                                    'bu': {
+                                        'name': bu1.name,
+                                        'id': bu1.id
+                                    },
+                                    "need_manager": 0,
+                                    'id': les_permission.id
+                                },
+                            }
+                            list1.append(data)
+                        else:
+                            data = {
+                                "be_thumbs": be_thumbs,
+                                "img_src": lesson.img_src,
+                                'tags': [],
+                                "lecturer": {},
+                                'oprt': {
+                                    'id': oper.id,
+                                    'name': oper.name,
+                                    'cls': {
+                                        'id': lescls.id,
+                                        'name': lescls.name
+                                    }
+                                },
+                                'contents': lesson.content,
+                                'id': lesson.id,
+                                'name': lesson.name,
+                                'be_collected': be_collected,
+                                'type': lesson.type,
+                                'passed': False,
+                                'test': False,
+                                'create_at': lesson.create_at,
+                                'lesson_permissions': {
+                                    'bu': {
+                                        'name': bu1.name,
+                                        'id': bu1.id
+                                    },
+                                    "need_manager": 0,
+                                    'id': les_permission.id
+                                },
+                            }
+                            list1.append(data)
             return jsonify(list1)
         else:
             return jsonify([])

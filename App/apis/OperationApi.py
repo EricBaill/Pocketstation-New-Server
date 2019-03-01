@@ -76,7 +76,7 @@ class OperationResource1(Resource):
             }
             return jsonify(data)
         else:
-            return jsonify({'err': '暂无信息！'})
+            return jsonify({})
 
     def delete(self,id):
         opers = Operation.query.filter(Operation.id.__eq__(id)).first()
@@ -107,4 +107,4 @@ class OperationResource2(Resource):
                 list_.append(data)
             return jsonify(list_)
         else:
-            return jsonify({'err': '暂无信息！'})
+            return jsonify([])

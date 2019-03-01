@@ -35,7 +35,7 @@ class Position(db.Model):
     __tablename__ = 'position'
 
     id = db.Column(db.Integer, primary_key=True)
-    bu_id = db.Column(db.ForeignKey('business_unit.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    bu_id = db.Column(db.Integer,db.ForeignKey('business_unit.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     name = db.Column(db.String(45), nullable=False)
     is_manager = db.Column(db.Integer, nullable=False)
 
@@ -65,7 +65,7 @@ class Admin(db.Model):
     type = db.Column(db.String(64),default='dealer')
     number = db.Column(db.Integer,default=0,nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    bu_id = db.Column(db.ForeignKey(BusinessUnit.id, ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    bu_id = db.Column(db.Integer,db.ForeignKey(BusinessUnit.id, ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     hd_id = db.relationship('HD', backref='admin')
     hd_ans_id = db.relationship('Hd_Ans', backref='admin')
 
@@ -84,7 +84,7 @@ class FAQ(db.Model):
 #互动
 class HD(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    admin_id = db.Column(db.ForeignKey(Admin.id, ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    admin_id = db.Column(db.Integer,db.ForeignKey(Admin.id, ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     question = db.Column(db.String(255),nullable=False)
     hd_ans_id = db.relationship('Hd_Ans',backref='hd')
     create_at = db.Column(db.DateTime, default=datetime.now)
@@ -93,7 +93,7 @@ class HD(db.Model):
 class Hd_Ans(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ans = db.Column(db.String(255),nullable=False)
-    admin_id = db.Column(db.ForeignKey(Admin.id, ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    admin_id = db.Column(db.Integer,db.ForeignKey(Admin.id, ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     hd_id = db.Column(db.Integer,db.ForeignKey(HD.id, ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     create_at = db.Column(db.DateTime, default=datetime.now)
 
@@ -115,8 +115,8 @@ class Experience(db.Model):
     content = db.Column(db.String(255))
     type = db.Column(db.Boolean,default=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    admin_id = db.Column(db.ForeignKey('admin.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    dealer_training_id = db.Column(db.ForeignKey('dealer_training.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    admin_id = db.Column(db.Integer,db.ForeignKey('admin.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    dealer_training_id = db.Column(db.Integer,db.ForeignKey('dealer_training.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
 
     admin = db.relationship('Admin', primaryjoin='Experience.admin_id == Admin.id', backref='experience')
     dealer_training = db.relationship('DealerTraining', primaryjoin='Experience.dealer_training_id == DealerTraining.id', backref='experience')
@@ -128,12 +128,12 @@ class DealerGain(db.Model):
     __tablename__ = 'dealer_gain'
 
     id = db.Column(db.Integer, primary_key=True)
-    dealer_id = db.Column(db.ForeignKey('admin.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    dealer_id = db.Column(db.Integer,db.ForeignKey('admin.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     title = db.Column(db.String(64), nullable=False)
     content = db.Column(db.String(255), nullable=False)
     top = db.Column(db.Integer, nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    training_id = db.Column(db.ForeignKey('dealer_training.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    training_id = db.Column(db.Integer,db.ForeignKey('dealer_training.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
 
     dealer = db.relationship('Admin', primaryjoin='DealerGain.dealer_id == Admin.id', backref='dealer_gains')
     training = db.relationship('DealerTraining', primaryjoin='DealerGain.training_id == DealerTraining.id', backref='dealer_gains')
@@ -173,7 +173,7 @@ class GratitudeStar(db.Model):
     __tablename__ = 'gratitude_star'
 
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     year_month = db.Column(db.String(45), nullable=False)
 
@@ -184,8 +184,8 @@ class Lesson(db.Model):
     __tablename__ = 'lesson'
 
     id = db.Column(db.Integer, primary_key=True)
-    oper_id = db.Column(db.ForeignKey('operation.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    lecturer_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'))
+    oper_id = db.Column(db.Integer,db.ForeignKey('operation.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    lecturer_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'))
     name = db.Column(db.String(45), nullable=False)
     type = db.Column(db.String(45), nullable=False)
     img_src = db.Column(db.String(255), nullable=False)
@@ -194,6 +194,8 @@ class Lesson(db.Model):
     is_look = db.Column(db.Integer, default=0)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     be_thumbs = db.Column(db.String(255))
+    # tools = db.relationship('Tool', backref='lesson', lazy='dynamic')
+    # permission = db.relationship('LessonPermission', backref='lesson', lazy='dynamic')
 
     oper = db.relationship('Operation', primaryjoin='Lesson.oper_id == Operation.id', backref='lesson')
     lecturer = db.relationship('User', primaryjoin='Lesson.lecturer_id == User.id', backref='lesson')
@@ -232,8 +234,8 @@ class LessonComment(db.Model):
     __tablename__ = 'lesson_comment'
 
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    lsn_id = db.Column(db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     # openid = db.Column(db.String(255),nullable=False)
     content = db.Column(db.String(255), nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
@@ -246,8 +248,8 @@ class LessonPermission(db.Model):
     __tablename__ = 'lesson_permission'
 
     id = db.Column(db.Integer, primary_key=True)
-    lsn_id = db.Column(db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    bu_id = db.Column(db.ForeignKey('business_unit.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    bu_id = db.Column(db.Integer,db.ForeignKey('business_unit.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     need_manager = db.Column(db.Integer, nullable=False)
 
     bu = db.relationship('BusinessUnit', primaryjoin='LessonPermission.bu_id == BusinessUnit.id', backref='lesson_permission')
@@ -259,10 +261,11 @@ class News(db.Model):
     __tablename__ = 'news'
 
     id = db.Column(db.Integer, primary_key=True)
-    cls_id = db.Column(db.ForeignKey('news_class.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    cls_id = db.Column(db.Integer,db.ForeignKey('news_class.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     name = db.Column(db.String(45), nullable=False)
     img_src = db.Column(db.String(255), nullable=False)
     brief = db.Column(db.String(255), nullable=False)
+    type_ = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     top = db.Column(db.Integer,default=0)
@@ -281,15 +284,15 @@ class Operation(db.Model):
     __tablename__ = 'operation'
 
     id = db.Column(db.Integer, primary_key=True)
-    cls_id = db.Column(db.ForeignKey('lesson_class.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    cls_id = db.Column(db.Integer,db.ForeignKey('lesson_class.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     name = db.Column(db.String(45), nullable=False)
     img_src = db.Column(db.String(255), nullable=False)
 
     cls = db.relationship('LessonClas', primaryjoin='Operation.cls_id == LessonClas.id', backref='operation')
 
 
-#权限表
 # class Permission(db.Model):
+#权限表
 #     __tablename__ = 'permission'
 #
 #     id = db.Column(db.Integer, primary_key=True)
@@ -302,7 +305,7 @@ class Point(db.Model):
     __tablename__ = 'points'
 
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     total_points = db.Column(db.Integer)
     # curr_points = db.Column(db.Integer)
     level = db.Column(db.String(64))
@@ -354,8 +357,8 @@ class Testing(db.Model):
     __tablename__ = 'testing'
 
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    lsn_id = db.Column(db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     score = db.Column(db.Float, nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
 
@@ -368,7 +371,7 @@ class NewTest(db.Model):
     __tablename__ = 'newtest'
 
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     staff_name = db.Column(db.String(125),nullable=False)
     select = db.Column(db.String(255))
     blanks = db.Column(db.String(255))
@@ -384,7 +387,7 @@ class Tool(db.Model):
     __tablename__ = 'tool'
 
     id = db.Column(db.Integer, primary_key=True)
-    lsn_id = db.Column(db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     name = db.Column(db.String(45), nullable=False)
     type = db.Column(db.String(45), nullable=False)
     content = db.Column(db.String(255), nullable=False)
@@ -396,9 +399,8 @@ class ToolCollection(db.Model):
     __tablename__ = 'tool_collection'
 
     id = db.Column(db.Integer, primary_key=True)
-    tool_id = db.Column(db.ForeignKey('tool.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    # create_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    tool_id = db.Column(db.Integer,db.ForeignKey('tool.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
 
     staff = db.relationship('User', primaryjoin='ToolCollection.staff_id == User.id', backref='tool_collection')
     tool = db.relationship('Tool', primaryjoin='ToolCollection.tool_id == Tool.id', backref='tool_collection')
@@ -408,8 +410,8 @@ class TrainingTask(db.Model):
     __tablename__ = 'training_task'
 
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    lsn_id = db.Column(db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     limit = db.Column(db.Integer, nullable=False)
     percent = db.Column(db.Float,default=0.0)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
@@ -423,7 +425,7 @@ class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
-    pos_id = db.Column(db.ForeignKey('position.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    pos_id = db.Column(db.Integer,db.ForeignKey('position.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     name = db.Column(db.String(45), nullable=False)
     email = db.Column(db.String(45), nullable=False)
     passwd = db.Column(db.String(45), nullable=False)
@@ -438,6 +440,7 @@ class User(db.Model):
     dayno = db.Column(db.Integer,default=0,nullable=False)
     newtest = db.relationship('NewTest',backref='user')
     openid = db.Column(db.String(255))
+    lesson_ = db.Column(db.String(255))
     jsapi_ticket = db.Column(db.String(128))
 
 
@@ -453,7 +456,7 @@ class Question(db.Model):
     __tablename__ = 'question'
 
     id = db.Column(db.Integer, primary_key=True)
-    lsn_id = db.Column(db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     content = db.Column(db.Text, nullable=False)
     correct_option = db.Column(db.Text, nullable=False)
     other_option = db.Column(db.Text, nullable=False)
@@ -465,8 +468,8 @@ class Question(db.Model):
 #     __tablename__ = 'usertest'
 #
 #     id = db.Column(db.Integer, primary_key=True)
-#     staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-#     lsn_id = db.Column(db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+#     staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+#     lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
 #     score = db.Column(db.Float, nullable=False)
 #     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 #
@@ -478,8 +481,8 @@ class LessonThumb(db.Model):
     __tablename__ = 'lesson_thumb'
 
     id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    lsn_id = db.Column(db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     lsn = db.relationship('Lesson', primaryjoin='LessonThumb.lsn_id == Lesson.id', backref='lesson_thumb')

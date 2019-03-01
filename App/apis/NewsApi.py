@@ -15,6 +15,7 @@ class NewsResource(Resource):
                 'id':new.id,
                 'name':new.name,
                 'content':new.content,
+                'type_':new.type_,
                 'brief':new.brief,
                 'top':new.top,
                 'create_at':new.create_at,
@@ -34,18 +35,21 @@ class NewsResource(Resource):
         parser.add_argument(name='img_src', type=str)
         parser.add_argument(name='brief', type=str)
         parser.add_argument(name='content', type=str)
+        parser.add_argument(name='type_', type=str)
         parse = parser.parse_args()
         name = parse.get('name')
         cls_id = parse.get('cls_id')
         img_src = parse.get('img_src')
         brief = parse.get('brief')
         content = parse.get('content')
+        type_ = parse.get('type_')
         news = News()
         news.name = name
         news.cls_id = cls_id
         news.img_src = img_src
         news.brief = brief
         news.content = content
+        news.type_ = type_
         try:
             db.session.add(news)
             db.session.commit()
@@ -200,4 +204,28 @@ class NewsResource3(Resource):
             return jsonify(list_)
         else:
             return jsonify({'err': '暂无信息！'})
-        
+
+
+class NewsResource4(Resource):
+    def get(self,type_):
+        list_ = []
+        news = News.query.filter(News.type_==type_).all()
+        if news:
+            for new in news:
+                cls_new = NewsClas.query.filter(NewsClas.id.__eq__(new.cls_id)).first()
+                data = {
+                    'id': new.id,
+                    'name': new.name,
+                    'img_src': new.img_src,
+                    'brief': new.brief,
+                    'content': new.content,
+                    'top': new.top,
+                    'cls': {
+                        'name': cls_new.name,
+                        'id': cls_new.id
+                    }
+                }
+                list_.append(data)
+            return jsonify(list_)
+        else:
+            return jsonify({'err': '暂无信息！'})

@@ -31,7 +31,7 @@ def upload_qiniu():
     # 如果上传成功
     if info.status_code == 200:
         # 数据库保存该地址
-        img_url = "http://pocketstation.cn/" + ret.get("key") #七牛云域名
+        img_url = "http://jxtidea.com/" + ret.get("key") #七牛云域名（注意：CNAME一定要配置）
         print(img_url)
     return '/'+key
 
@@ -40,4 +40,3 @@ if __name__ == '__main__':
 
     # manager.run()
     app.run(host='0.0.0.0',port='5000')
-  

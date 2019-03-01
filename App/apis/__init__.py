@@ -20,7 +20,7 @@ from App.apis.LsnCollectionApi import LsnCollectionResource, LsnCollectionResour
     LsnCollectionResource3
 from App.apis.LsnThumbApi import LsnThumbResource, LsnThumbResource1, LsnThumbResource2
 from App.apis.NewTestApi import NewTestResource
-from App.apis.NewsApi import NewsResource, NewsResource1, NewsResource2, NewsResource3
+from App.apis.NewsApi import NewsResource, NewsResource1, NewsResource2, NewsResource3, NewsResource4
 from App.apis.NewsClsApi import NewsClsResource, NewsClsResource1
 from App.apis.OperationApi import OperationResource, OperationResource1, OperationResource2
 from App.apis.PointsApi import PointsResource
@@ -33,7 +33,7 @@ from App.apis.TeacherApi import TeacherResource
 from App.apis.TokenApi import TokenResource, TokenResource1, TokenResource2, TokenResource3
 from App.apis.ToolCollectionApi import ToolCollResource, ToolCollResource1, ToolCollResource2, ToolCollResource3
 from App.apis.ToolsApi import ToolsResource, ToolsResource1
-from App.apis.TrainTaskApi import TrainTaskResource, TrainTaskResource1
+from App.apis.TrainTaskApi import TrainTaskResource, TrainTaskResource1, LearnTask, LearnTask1
 from App.apis.UserQuesApi import UserQuesResource, UserQuesResource1, UserQuesResource2
 from App.apis.UserResourceApi import UserResourceApi, UserResourceApi1, UserResourceApi2, UserResourceApi3, \
     UserResourceApi4, UserResourceApi5
@@ -100,6 +100,7 @@ api.add_resource(NewsResource,'/api/v2/newses/')
 api.add_resource(NewsResource1,'/api/v2/news/<id>')
 api.add_resource(NewsResource2,'/api/v2/news/search/')
 api.add_resource(NewsResource3,'/api/v2/news/look/<cls_id>')
+api.add_resource(NewsResource4,'/api/v2/news/type_/<type_>/')
 
 api.add_resource(NewsClsResource,'/api/v2/news_cls/')
 api.add_resource(NewsClsResource1,'/api/v2/news_cls/<id>')
@@ -203,6 +204,10 @@ api.add_resource(TrainTaskResource1,'/api/v2/traintask/<id>')
 #记录用户登录次数
 api.add_resource(LoginNumber,'/api/v2/numbers/')
 api.add_resource(PointsResource,'/api/v2/points/<staff_id>')
+
+#学习任务
+api.add_resource(LearnTask,'/api/v2/learning/task/<staff_id>/')
+api.add_resource(LearnTask1,'/api/v2/learning/task/<staff_id>/lesson/<lsn_id>/')
 
 
 

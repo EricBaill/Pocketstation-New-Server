@@ -3,9 +3,6 @@ from App.models import A_banner, db
 from flask import jsonify
 
 
-parser = reqparse.RequestParser()
-parser.add_argument(name='cover_img',type=str,required=True,help='图片不能为空')
-parser.add_argument(name='content',type=str,required=True,help='内容不能为空')
 
 class DealerLbtApi(Resource):
     def get(self):
@@ -21,6 +18,9 @@ class DealerLbtApi(Resource):
         return jsonify(list_)
 
     def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument(name='cover_img', type=str, required=True, help='图片不能为空')
+        parser.add_argument(name='content', type=str, required=True, help='内容不能为空')
         parse = parser.parse_args()
         cover_img = parse.get('cover_img')
         content = parse.get('content')
@@ -57,19 +57,18 @@ class DealerLbtApi1(Resource):
 
 class DealerLbtApi2(Resource):
     def put(self, news_id):
+        parser = reqparse.RequestParser()
+        parser.add_argument(name='cover_img', type=str, required=True, help='图片不能为空')
         parse = parser.parse_args()
         cover_img = parse.get('cover_img')
-        content = parse.get('content')
         print(cover_img)
-        print(content)
         banner = A_banner.query.filter(A_banner.id==news_id).first()
         banner.cover_img = cover_img
-        banner.content = content
         db.session.commit()
         data = {
             'id': banner.id,
             'cover_img': cover_img,
-            'content': content
+            'content': banner.content
         }
         return jsonify(data)
 

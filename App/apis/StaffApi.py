@@ -86,7 +86,7 @@ class StaffRespource1(Resource):
     def get(self,user_id):
         user = User.query.filter(User.id.__eq__(user_id)).first()
         if user:
-            num = user.number
+            num = user.dayno
             return jsonify(num)
         else:
             return jsonify({'err':'用户不存在！'})

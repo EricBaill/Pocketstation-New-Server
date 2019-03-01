@@ -72,6 +72,8 @@ class UserResourceApi(Resource):
 class UserResourceApi1(Resource):
     def get(self,resId):
         res = UserResource.query.filter(UserResource.p_id==resId).all()
+        print(res)
+        print(resId)
         list_ = []
         for re in res:
             data = {
