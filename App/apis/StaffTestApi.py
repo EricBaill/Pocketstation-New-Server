@@ -1,7 +1,7 @@
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
-from App.models import Question, Testing, db
+from App.models import Question, Testing, db, User
 
 
 class StaffTestResource(Resource):
@@ -29,13 +29,33 @@ class StaffTestResource1(Resource):
         lsn_id = parse.get('lsn_id')
         staff_id = parse.get('staff_id')
         score = parse.get('score')
-        test = Testing()
-        test.lsn_id = lsn_id
-        test.staff_id = staff_id
-        test.score = score
-        try:
-            db.session.add(test)
-            db.session.commit()
-        except Exception as e:
-            print(str(e))
-        return jsonify({'msg':'提交成功！'})
+        user = User.query.filter(User.id==staff_id).first()
+        if user:
+            if score == 1.0:
+                if user.passed:
+                    str1 = user.passed + '#' + str(lsn_id)
+                    str2 = str1.split('#')
+                    str3 = list(set(str2))
+                    user.passed = "#".join(str3)
+                    test = Testing()
+                    test.lsn_id = lsn_id
+                    test.staff_id = staff_id
+                    test.score = score
+                    db.session.add(test)
+                    db.session.commit()
+                    return jsonify({'msg':'提交成功！'})
+                else:
+                    user.passed = str(lsn_id)
+                    db.session.commit()
+                    return jsonify({'msg': '提交成功！'})
+            else:
+                test = Testing()
+                test.lsn_id = lsn_id
+                test.staff_id = staff_id
+                test.score = score
+                db.session.add(test)
+                db.session.commit()
+                return jsonify({'msg': '提交成功！'})
+
+        else:
+            return jsonify({})

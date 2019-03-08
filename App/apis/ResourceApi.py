@@ -165,6 +165,10 @@ class ResourceApi5(Resource):
     def delete(self,resId):
         res = DealerResource.query.filter(DealerResource.id.__eq__(resId)).first()
         if res:
+            ress = DealerResource.query.filter(DealerResource.p_id==res.id).all()
+            if ress:
+                for re in ress:
+                    db.session.delete(re)
             db.session.delete(res)
             db.session.commit()
             return jsonify({'msg':'删除成功！'})

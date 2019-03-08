@@ -1,6 +1,11 @@
+import datetime
+import json
+
+import requests
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
+from App.apis.TokenApi import logger
 from App.models import TrainingTask, db, User, Lesson, Operation, LessonClas
 
 
@@ -55,14 +60,151 @@ class TrainTaskResource(Resource):
         lsn_id = parse.get('lsn_id')
         staff_id = parse.get('staff_id')
         limit = parse.get('limit')
-        traintask = TrainingTask()
-        traintask.limit = limit
-        traintask.lsn_id = lsn_id
-        traintask.staff_id = staff_id
-        db.session.add(traintask)
-        db.session.commit()
 
-        return jsonify({'msg':'添加成功！'})
+        appid = 'wxc7cf4e85ecbf8282'
+        secret = 'bafb0339afa3db639000a92ae15ff072'
+
+        user = User.query.filter(User.id==staff_id).first()
+        lesson = Lesson.query.filter(Lesson.id==lsn_id).first()
+        teacher = User.query.filter(User.id==lesson.lecturer_id).first()
+        task = TrainingTask.query.filter(TrainingTask.staff_id==staff_id,TrainingTask.lsn_id==lsn_id).first()
+        if task:
+            return jsonify({'msg':'任务已存在！'})
+        else:
+            if teacher:
+                if user and user.openid:
+                    url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}'.format(
+                        appid,
+                        secret)
+                    response = requests.get(url)
+                    logger.info('post[%s]=>[%s][%s][%s]' % (
+                        appid, secret, response.status_code, response.text
+                    ))
+                    resData = response.json()
+                    access_token = resData['access_token']
+                    u_openid = user.openid
+                    url1 = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token={}'.format(
+                        access_token)
+                    response = requests.get(url1)
+                    logger.info('post[%s]=>[%s][%s]' % (
+                        access_token, response.status_code, response.text
+                    ))
+                    resData = response.json()
+
+                    openid = u_openid
+                    template_id = resData['template_list'][-1]['template_id']
+                    url = 'http://192.168.1.104：8000/'
+                    time_ = datetime.datetime.now().strftime('%F %T')
+                    msg = {
+                        "touser": openid,
+                        "template_id": template_id,
+                        "url": url,
+                        "data": {
+                            "first": {
+                                "value": "你有新的学习任务，请查收。",
+                                "color": "#000"
+                            },
+                            "keyword1": {
+                                "value": "口袋加油站",
+                                "color": "#000"
+                            },
+                            "keyword2": {
+                                "value": teacher.name,
+                                "color": "#000"
+                            },
+                            "keyword3": {
+                                "value": lesson.name,
+                                "color": "#000"
+                            },
+                            "keyword4": {
+                                "value": time_,
+                                "color": "#000"
+                            },
+                            "remark": {
+                                "value": "请于{}以内完全此学习任务。".format(limit),
+                                "color": "#000"
+                            },
+
+                        }
+                    }
+                    json_data = json.dumps(msg)
+                    url4 = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s' % access_token
+                    r = requests.post(url4, json_data)
+                    print(json.loads(r.text))
+                else:
+                    pass
+            else:
+                if user and user.openid:
+                    url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}'.format(
+                        appid,
+                        secret)
+                    response = requests.get(url)
+                    logger.info('post[%s]=>[%s][%s][%s]' % (
+                        appid, secret, response.status_code, response.text
+                    ))
+                    resData = response.json()
+                    access_token = resData['access_token']
+
+                    u_openid = user.openid
+
+                    url1 = 'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token={}'.format(
+                        access_token)
+                    response = requests.get(url1)
+                    logger.info('post[%s]=>[%s][%s]' % (
+                        access_token, response.status_code, response.text
+                    ))
+                    resData = response.json()
+
+                    openid = u_openid
+                    template_id = resData['template_list'][-1]['template_id']
+                    url = 'http://192.168.1.104：8000/'
+                    time_ = datetime.datetime.now().strftime('%F %T')
+                    msg = {
+                        "touser": openid,
+                        "template_id": template_id,
+                        "url": url,
+                        "data": {
+                            "first": {
+                                "value": "你有新的学习任务，请查收。",
+                                "color": "#000"
+                            },
+                            "keyword1": {
+                                "value": "口袋加油站",
+                                "color": "#000"
+                            },
+                            "keyword2": {
+                                "value": "无",
+                                "color": "#000"
+                            },
+                            "keyword3": {
+                                "value": lesson.name,
+                                "color": "#000"
+                            },
+                            "keyword4": {
+                                "value": time_,
+                                "color": "#000"
+                            },
+                            "remark": {
+                                "value": "请于{}以内完全此学习任务。".format(limit),
+                                "color": "#000"
+                            },
+
+                        }
+                    }
+                    json_data = json.dumps(msg)
+                    url4 = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s' % access_token
+                    r = requests.post(url4, json_data)
+                    print(json.loads(r.text))
+                else:
+                    pass
+            traintask = TrainingTask()
+            traintask.limit = limit
+            traintask.lsn_id = lsn_id
+            traintask.staff_id = staff_id
+            db.session.add(traintask)
+            db.session.commit()
+
+            return jsonify({'msg':'添加成功！'})
 
 class TrainTaskResource1(Resource):
     def delete(self,id):

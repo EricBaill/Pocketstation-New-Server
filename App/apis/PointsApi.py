@@ -26,14 +26,24 @@ class PointsResource(Resource):
             extract('month', Gratitude.create_at) == months,
             extract('day', Gratitude.create_at) == days
         )).all()
+        if user.passed:
+            str1 = user.passed.split('#')
+            str1 = len(str1)
+        else:
+            str1 = 0
 
+        if user.lesson_:
+            str2 = user.lesson_.split('#')
+            str2 = len(str2)
+        else:
+            str2 = 0
         if poin:
             if from_grat or to_grat or user:
 
                 if len(from_grats) <= 5 and len(to_grats) <= 5:
                     l = len(from_grat)
                     l1 = len(to_grat)
-                    num1 = user.dayno + l + l1
+                    num1 = user.dayno + l + l1 + str1 + str2
                     point = num1 * 2
 
                     if 0 <= point <= 50:
@@ -61,7 +71,7 @@ class PointsResource(Resource):
                 elif len(from_grats) > 5 and len(to_grats) > 5:
                     l = 5
                     l1 = 5
-                    num1 = user.dayno + l + l1
+                    num1 = user.dayno + l + l1 + str1 + str2
                     point = num1 * 2
 
                     if 0 <= point <= 50:
@@ -89,7 +99,7 @@ class PointsResource(Resource):
                 elif len(from_grats) <= 5 and len(to_grats) > 5:
                     l = len(from_grat)
                     l1 = 5
-                    num1 = user.dayno + l + l1
+                    num1 = user.dayno + l + l1 + str1 + str2
                     point = num1 * 2
 
                     if 0 <= point <= 50:
@@ -117,7 +127,7 @@ class PointsResource(Resource):
                 elif len(from_grats) > 5 and len(to_grats) <= 5:
                     l = 5
                     l1 = len(to_grat)
-                    num1 = user.dayno + l + l1
+                    num1 = user.dayno + l + l1  + str1 + str2
                     point = num1 * 2
 
                     if 0 <= point <= 50:
@@ -141,14 +151,12 @@ class PointsResource(Resource):
                         'level': poin.level
                     }
                     return jsonify(data)
-
         else:
-
             if from_grat or to_grat or user:
                 if len(from_grats) <= 5 and len(to_grats) <= 5:
                     l = len(from_grat)
                     l1 = len(to_grat)
-                    num1 = user.dayno + l + l1
+                    num1 = user.dayno + l + l1 + str1 + str2
                     point = num1 * 2
                     poin = Point()
                     if 0 <= point <= 50:
@@ -178,7 +186,7 @@ class PointsResource(Resource):
                 elif len(from_grats) > 5 and len(to_grats) > 5:
                     l = 5
                     l1 = 5
-                    num1 = user.dayno + l + l1
+                    num1 = user.dayno + l + l1 + str1 + str2
                     point = num1 * 2
                     poin = Point()
                     if 0 <= point <= 50:
@@ -208,7 +216,7 @@ class PointsResource(Resource):
                 elif len(from_grats) <= 5 and len(to_grats) > 5:
                     l = len(from_grat)
                     l1 = 5
-                    num1 = user.dayno + l + l1
+                    num1 = user.dayno + l + l1 + str1 + str2
                     point = num1 * 2
                     poin = Point()
                     if 0 <= point <= 50:
@@ -238,7 +246,7 @@ class PointsResource(Resource):
                 elif len(from_grats) > 5 and len(to_grats) <= 5:
                     l = 5
                     l1 = len(to_grat)
-                    num1 = user.dayno + l + l1
+                    num1 = user.dayno + l + l1 + str1 + str2
                     point = num1 * 2
                     poin = Point()
                     if 0 <= point <= 50:
@@ -264,3 +272,25 @@ class PointsResource(Resource):
                         'level': poin.level
                     }
                     return jsonify(data)
+
+class Points01(Resource):
+    def get(self,staff_id):
+        user = User.query.filter(User.id==staff_id).first()
+        if user:
+            data = {
+                'account':user.passed
+            }
+            return jsonify(data)
+        else:
+            return jsonify({})
+
+class Points02(Resource):
+    def get(self,staff_id):
+        user = User.query.filter(User.id==staff_id).first()
+        if user:
+            data = {
+                'account':user.lesson_
+            }
+            return jsonify(data)
+        else:
+            return jsonify({})

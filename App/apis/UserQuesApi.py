@@ -1,4 +1,3 @@
-import tempfile
 import traceback
 
 from flask import jsonify, request

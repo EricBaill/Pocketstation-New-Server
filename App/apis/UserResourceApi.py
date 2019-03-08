@@ -72,8 +72,6 @@ class UserResourceApi(Resource):
 class UserResourceApi1(Resource):
     def get(self,resId):
         res = UserResource.query.filter(UserResource.p_id==resId).all()
-        print(res)
-        print(resId)
         list_ = []
         for re in res:
             data = {
@@ -149,13 +147,17 @@ class UserResourceApi2(Resource):
         parse = parser.parse_args()
         name = parse.get('name')
         content = parse.get('content')
-        type = parse.get('type')
-        hier = parse.get('hier')
+        type_ = parse.get('type')
+        hier_ = parse.get('hier')
         re = UserResource()
         re.name = name
-        re.type = type
+        re.type = type_
         re.content = content
-        re.p_id = hier
+        re.p_id = hier_
+        print(hier_)
+        print(content)
+        print(name)
+        print(type)
         db.session.add(re)
         db.session.commit()
         if type == 'folder':
@@ -167,8 +169,8 @@ class UserResourceApi2(Resource):
                 'id':id,
                 'name':name,
                 'content':content,
-                'type':type,
-                'hier':hier
+                'type':type_,
+                'hier':hier_
             }
             return jsonify(data)
 
@@ -225,6 +227,10 @@ class UserResourceApi5(Resource):
     def delete(self,resId):
         res = UserResource.query.filter(UserResource.id.__eq__(resId)).first()
         if res:
+            ress = UserResource.query.filter(UserResource.p_id==res.id).all()
+            if ress:
+                for re in ress:
+                    db.session.delete(re)
             db.session.delete(res)
             db.session.commit()
             return jsonify({'msg':'删除成功！'})

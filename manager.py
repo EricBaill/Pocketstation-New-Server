@@ -31,7 +31,7 @@ def upload_qiniu():
     # 如果上传成功
     if info.status_code == 200:
         # 数据库保存该地址
-        img_url = "http://jxtidea.com/" + ret.get("key") #七牛云域名（注意：CNAME一定要配置）
+        img_url = "http://soft1906.xin/" + ret.get("key") #七牛云域名（注意：CNAME一定要配置）
         print(img_url)
     return '/'+key
 

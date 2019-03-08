@@ -438,6 +438,7 @@ class User(db.Model):
     lsn_comment = db.relationship('LessonComment',backref='user')
     number = db.Column(db.Integer,default=0,nullable=False)
     dayno = db.Column(db.Integer,default=0,nullable=False)
+    passed = db.Column(db.String(255))
     newtest = db.relationship('NewTest',backref='user')
     openid = db.Column(db.String(255))
     lesson_ = db.Column(db.String(255))

@@ -23,7 +23,7 @@ from App.apis.NewTestApi import NewTestResource
 from App.apis.NewsApi import NewsResource, NewsResource1, NewsResource2, NewsResource3, NewsResource4
 from App.apis.NewsClsApi import NewsClsResource, NewsClsResource1
 from App.apis.OperationApi import OperationResource, OperationResource1, OperationResource2
-from App.apis.PointsApi import PointsResource
+from App.apis.PointsApi import PointsResource, Points01, Points02
 from App.apis.PositionApi import PositionResource, PositionResource1, PositionResource2
 from App.apis.ResourceApi import ResourceApi, ResourceApi1, ResourceApi2, ResourceApi3, ResourceApi4, ResourceApi5
 from App.apis.StaffApi import StaffRespource, StaffRespource1, StaffRespource2
@@ -135,7 +135,7 @@ api.add_resource(OperationResource2,'/api/v2/lesson_classes/<cls_id>/operations/
 
 #课程信息
 api.add_resource(LessonResource,'/api/v2/lesson/')
-api.add_resource(LessonResource1,'/api/v2/lesson/<id>')
+api.add_resource(LessonResource1,'/api/v2/lesson/<id>/staff/<staff_id>/')
 
 api.add_resource(LessonResource2,'/api/v2/operations/<subPart_id>/staffs/<openid>/lessons/<types>/')
 api.add_resource(LessonResource3,'/api/v2/recommend/<user_id>/lessons/')
@@ -204,6 +204,8 @@ api.add_resource(TrainTaskResource1,'/api/v2/traintask/<id>')
 #记录用户登录次数
 api.add_resource(LoginNumber,'/api/v2/numbers/')
 api.add_resource(PointsResource,'/api/v2/points/<staff_id>')
+api.add_resource(Points01,'/api/v2/task/account/<staff_id>')
+api.add_resource(Points02,'/api/v2/lesson_/account/<staff_id>')
 
 #学习任务
 api.add_resource(LearnTask,'/api/v2/learning/task/<staff_id>/')
