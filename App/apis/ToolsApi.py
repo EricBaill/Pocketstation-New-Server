@@ -1,7 +1,10 @@
+import datetime
+from sqlalchemy import extract, and_
+
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
-from App.models import Tool, ToolCollection, Lesson, Operation, LessonClas, db
+from App.models import Tool, ToolCollection, Lesson, Operation, LessonClas, db, User
 
 
 class ToolsResource(Resource):
@@ -156,3 +159,40 @@ class ToolsResource1(Resource):
         }
         return jsonify(data)
 
+
+
+class Tools1(Resource):
+    def get(self,tool_id,staff_id):
+        year_ = datetime.datetime.now().year
+        month_ = datetime.datetime.now().month
+        day_ = datetime.datetime.now().day
+        user_ = User.query.filter(User.id == staff_id, and_(
+            extract('year', User.update_time) == year_,
+            extract('month', User.update_time) == month_,
+            extract('day', User.update_time) == day_
+        )).first()
+        user = User.query.filter(User.id==staff_id).first()
+        if user:
+            if user.toolnumber:
+                str1 = user.toolnumber + '#' + tool_id
+                str2 = str1.split('#')
+                str3 = list(set(str2))
+                user.toolnumber = "#".join(str3)
+                user.toolnumber_day = "#".join(str3)
+                db.session.commit()
+                if user_:
+                    pass
+                else:
+                    u = User.query.filter(User.id == staff_id).first()
+                    u.toolnumber_day = tool_id
+                    db.session.commit()
+
+                return jsonify({'msg':'成功！'})
+            else:
+                user.toolnumber = tool_id
+                user.toolnumber_day = tool_id
+                db.session.commit()
+                return jsonify({'msg': '成功！'})
+
+        else:
+            return jsonify({})

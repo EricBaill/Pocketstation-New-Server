@@ -13,18 +13,21 @@ from App.apis.GratitudeApi import GratitudeResource, GratitudeResource1, Gratitu
 from App.apis.HotMsgApi import HotMsgResource
 from App.apis.LecturerApi import LecturerResource
 from App.apis.LesCommentApi import LesCommentResource, LesCommentResource1, LesCommentResource2, LesCommentResource3
-from App.apis.LessonApi import LessonResource, LessonResource1, LessonResource2, LessonResource3, LessonResource4
+from App.apis.LessonApi import LessonResource, LessonResource1, LessonResource2, LessonResource3, LessonResource4, \
+    Lesson11
 from App.apis.LessonClasApi import LessonClasResource, LessonClasResource1
 from App.apis.LoginNumberApi import LoginNumber
 from App.apis.LsnCollectionApi import LsnCollectionResource, LsnCollectionResource1, LsnCollectionResource2, \
     LsnCollectionResource3
 from App.apis.LsnThumbApi import LsnThumbResource, LsnThumbResource1, LsnThumbResource2
 from App.apis.NewTestApi import NewTestResource
-from App.apis.NewsApi import NewsResource, NewsResource1, NewsResource2, NewsResource3, NewsResource4
+from App.apis.NewsApi import NewsResource, NewsResource1, NewsResource2, NewsResource3, NewsResource4, News11
 from App.apis.NewsClsApi import NewsClsResource, NewsClsResource1
 from App.apis.OperationApi import OperationResource, OperationResource1, OperationResource2
-from App.apis.PointsApi import PointsResource, Points01, Points02
+from App.apis.OrderApi import Order_, GetOrder, GetOrder01, DelOrder, GetallOrders, OrderStatus
+from App.apis.PointsApi import PointsResource, Points01, Points02, Points03, Points04, Points05
 from App.apis.PositionApi import PositionResource, PositionResource1, PositionResource2
+from App.apis.ProductionApi import Production_, Production_01
 from App.apis.ResourceApi import ResourceApi, ResourceApi1, ResourceApi2, ResourceApi3, ResourceApi4, ResourceApi5
 from App.apis.StaffApi import StaffRespource, StaffRespource1, StaffRespource2
 from App.apis.StaffTestApi import StaffTestResource, StaffTestResource1
@@ -32,11 +35,11 @@ from App.apis.Staff_bannerApi import StaffBannerResource
 from App.apis.TeacherApi import TeacherResource
 from App.apis.TokenApi import TokenResource, TokenResource1, TokenResource2, TokenResource3
 from App.apis.ToolCollectionApi import ToolCollResource, ToolCollResource1, ToolCollResource2, ToolCollResource3
-from App.apis.ToolsApi import ToolsResource, ToolsResource1
+from App.apis.ToolsApi import ToolsResource, ToolsResource1, Tools1
 from App.apis.TrainTaskApi import TrainTaskResource, TrainTaskResource1, LearnTask, LearnTask1
 from App.apis.UserQuesApi import UserQuesResource, UserQuesResource1, UserQuesResource2
-from App.apis.UserResourceApi import UserResourceApi, UserResourceApi1, UserResourceApi2, UserResourceApi3, \
-    UserResourceApi4, UserResourceApi5
+from App.apis.UserResourceApi import UserResource2, UserResourceApi1, UserResourceApi2, UserResourceApi3, \
+    UserResourceApi4, UserResourceApi5, UserResource1
 
 api = Api()
 #需要注意  api的初始化 要和init方法联系 否则无法初始化
@@ -97,7 +100,8 @@ api.add_resource(TokenResource3,'/api/v2/tokens/code/<code>')
 
 #新闻管理
 api.add_resource(NewsResource,'/api/v2/newses/')
-api.add_resource(NewsResource1,'/api/v2/news/<id>')
+api.add_resource(NewsResource1,'/api/v2/news/<id>/user/<staff_id>/')
+api.add_resource(News11,'/api/v2/news/<id>')
 api.add_resource(NewsResource2,'/api/v2/news/search/')
 api.add_resource(NewsResource3,'/api/v2/news/look/<cls_id>')
 api.add_resource(NewsResource4,'/api/v2/news/type_/<type_>/')
@@ -136,6 +140,7 @@ api.add_resource(OperationResource2,'/api/v2/lesson_classes/<cls_id>/operations/
 #课程信息
 api.add_resource(LessonResource,'/api/v2/lesson/')
 api.add_resource(LessonResource1,'/api/v2/lesson/<id>/staff/<staff_id>/')
+api.add_resource(Lesson11,'/api/v2/lesson/<id>')
 
 api.add_resource(LessonResource2,'/api/v2/operations/<subPart_id>/staffs/<openid>/lessons/<types>/')
 api.add_resource(LessonResource3,'/api/v2/recommend/<user_id>/lessons/')
@@ -179,9 +184,11 @@ api.add_resource(ToolCollResource,'/api/v2/toolcollections/')
 api.add_resource(ToolCollResource1,'/api/v2/staffs/<user_id>/toolcollections/')
 api.add_resource(ToolCollResource2,'/api/v2/staffs/<user_id>/toolcollections/<tool_id>/')
 api.add_resource(ToolCollResource3,'/api/v2/staff/<user_id>/tools/')
+api.add_resource(Tools1,'/api/v2/number/staff/<staff_id>/tools/<tool_id>/')
 
 #员工资源表
-api.add_resource(UserResourceApi,'/api/v2/staff/<user_id>/hier/<hier>/resources/<resId>/')
+api.add_resource(UserResource1,'/api/v2/staff/<user_id>/resnumber/<res_id>/')
+api.add_resource(UserResource2,'/api/v2/staff/<user_id>/hier/<hier>/resources/<resId>/')
 api.add_resource(UserResourceApi1,'/api/v2/staff/resource/<resId>/')
 
 api.add_resource(UserResourceApi2,'/api/v2/staff/getresource/')
@@ -201,15 +208,38 @@ api.add_resource(LecturerResource,'/api/v2/lecturers/')
 api.add_resource(TrainTaskResource,'/api/v2/traintask/')
 api.add_resource(TrainTaskResource1,'/api/v2/traintask/<id>')
 
-#记录用户登录次数
+#积分计算
 api.add_resource(LoginNumber,'/api/v2/numbers/')
 api.add_resource(PointsResource,'/api/v2/points/<staff_id>')
 api.add_resource(Points01,'/api/v2/task/account/<staff_id>')
 api.add_resource(Points02,'/api/v2/lesson_/account/<staff_id>')
+api.add_resource(Points03,'/api/v2/news/number/<staff_id>/')
+api.add_resource(Points04,'/api/v2/tool/number/<staff_id>/')
+api.add_resource(Points05,'/api/v2/res/number/<staff_id>/')
 
 #学习任务
 api.add_resource(LearnTask,'/api/v2/learning/task/<staff_id>/')
 api.add_resource(LearnTask1,'/api/v2/learning/task/<staff_id>/lesson/<lsn_id>/')
+
+
+#内购商城
+#获取商品信息
+api.add_resource(Production_,'/api/v2/get/productions/')
+api.add_resource(Production_01,'/api/v2/get/production/<id>/')
+
+#添加订单
+api.add_resource(Order_,'/api/v2/add/order/')
+#获取订单
+api.add_resource(GetOrder,'/api/v2/get/orders/<staff_id>/')
+#订单详情
+api.add_resource(GetOrder01,'/api/v2/get/one/order/<id>/')
+#删除订单信息
+api.add_resource(DelOrder,'/api/v2/delete/order/<id>/')
+#获取订单列表
+api.add_resource(GetallOrders,'/api/v2/get/all/orders/')
+#修改订单状态
+api.add_resource(OrderStatus,'/api/v2/status/order/<id>/')
+
 
 
 

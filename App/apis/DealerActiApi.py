@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from App.models import HD, Hd_Ans, Admin, db, User
+from App.models import HD, Hd_Ans, Admin, db
 
 from flask import jsonify
 
@@ -27,29 +27,13 @@ class DealerActiApi1(Resource):
                 'avatar': admin.avatar,
                 'name': admin.name,
                 'ques': ques,
-                'create_at': hd1s.create_at,
+                'create_at': hd1s.create_at.strftime('%Y/%m/%d'),
                 'reply': 0
             }
             return jsonify(data)
         else:
             return jsonify({})
-            # hd = HD()
-            # hd.question = ques
-            # hd.admin_id = user_id
-            # db.session.add(hd)
-            # db.session.commit()
-            # user = User.query.filter(User.id.__eq__(user_id)).first()
-            # hd1s = HD.query.filter(HD.admin_id == user_id).order_by(HD.id.desc()).first()
-            # data = {
-            #     'id': admin.id,
-            #     'ques_id': hd1s.id,
-            #     'avatar': admin.avatar,
-            #     'name': admin.name,
-            #     'ques': ques,
-            #     'create_at': hd1s.create_at,
-            #     'reply': 0
-            # }
-            # return jsonify(data)
+
 
 class DealerActiApi2(Resource):
     #提交答案
@@ -72,7 +56,7 @@ class DealerActiApi2(Resource):
             'avatar': admin.avatar,
             'name': admin.name,
             'reply': reply,
-            'create_at': hd_ans.create_at
+            'create_at': hd_ans.create_at.strftime('%Y/%m/%d')
         }
         return jsonify(data)
 
@@ -89,7 +73,7 @@ class DealerActiApi3(Resource):
                 'name': admins.name,
                 'reply': hd.ans,
                 'reply_id': hd.id,
-                'create_at': hd.create_at
+                'create_at': hd.create_at.strftime('%Y/%m/%d')
             }
             list_.append(data)
         return jsonify(list_)
@@ -113,7 +97,7 @@ class DealerActiApi4(Resource):
                     'name': admin.name,
                     'ques_id':h.id,
                     'ques': h.question,
-                    'create_at': h.create_at,
+                    'create_at': h.create_at.strftime('%Y/%m/%d'),
                     'reply':reply[i]
                 }
                 list_.append(data)
@@ -125,7 +109,7 @@ class DealerActiApi4(Resource):
                     'name': admin.name,
                     'ques_id': h.id,
                     'ques': h.question,
-                    'create_at': h.create_at,
+                    'create_at': h.create_at.strftime('%Y/%m/%d'),
                     'reply': 0
                 }
                 list_.append(data)

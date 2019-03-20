@@ -73,7 +73,7 @@ class GratitudeResource(Resource):
 
         openid = u_openid
         template_id = resData['template_list'][-1]['template_id']
-        url = 'http://192.168.1.104:8000/'
+        url = 'https://pocketstation.cn/'
         msg = {
             "touser": openid,
             "template_id": template_id,

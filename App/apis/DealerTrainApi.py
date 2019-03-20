@@ -1,7 +1,7 @@
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
-from App.models import DealerTraining, db
+from App.models import DealerTraining, db, Experience
 
 
 class DealerTrainResource(Resource):
@@ -93,11 +93,7 @@ class DealerTrainResource1(Resource):
                 lecturer = train.lecturer
                 train.content = content
                 train.desc = desc
-                # try:
-                #     db.session.add(train)
                 db.session.commit()
-                # except Exception as e:
-                #     print(str(e))
                 data = {
                     'id': id,
                     'title': title,
@@ -111,8 +107,12 @@ class DealerTrainResource1(Resource):
             return {'code': '404', 'msg': '暂无此信息！'}
 
     def delete(self, id):
-        print(id)
         trains = DealerTraining.query.filter(DealerTraining.id==id).first()
+        expers = Experience.query.filter(Experience.dealer_training_id==id).all()
+        if expers:
+            for exper in expers:
+                db.session.delete(exper)
+            db.session.commit()
         if trains:
             db.session.delete(trains)
             db.session.commit()

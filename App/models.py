@@ -11,24 +11,6 @@ class BusinessUnit(db.Model):
     name = db.Column(db.String(45), nullable=False)
     admin_id = db.relationship('Admin', backref='business_unit')
 
-    # poss = db.relationship('Position', secondary='ref_pos_bu', backref='business_units')
-    # trainings = db.relationship('DealerTraining', secondary='ref_training_permission', backref='business_units')
-
-#部门和经销商
-# t_ref_training_permission = db.Table(
-#     'ref_training_permission',
-#     db.Column('bu_id', db.ForeignKey('business_unit.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True),
-#     db.Column('training_id', db.ForeignKey('dealer_training.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True),
-# )
-
-
-# t_ref_pos_bu = db.Table(
-#     'ref_pos_bu',
-#     db.Column('pos_id', db.ForeignKey('position.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True),
-#     db.Column('bu_id', db.ForeignKey('business_unit.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True),
-# )
-
-
 
 #职位信息表
 class Position(db.Model):
@@ -40,16 +22,6 @@ class Position(db.Model):
     is_manager = db.Column(db.Integer, nullable=False)
 
     bu = db.relationship('BusinessUnit', primaryjoin='Position.bu_id == BusinessUnit.id', backref='position')
-
-
-    # users = db.relationship('User', secondary='ref_user_pos', backref='position')
-
-# t_ref_user_pos = db.Table(
-#     'ref_user_pos',
-#     db.Column('staff_id', db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True),
-#     db.Column('pos_id', db.ForeignKey('position.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True),
-# )
-
 
 
 #经销商表
@@ -69,9 +41,11 @@ class Admin(db.Model):
     hd_id = db.relationship('HD', backref='admin')
     hd_ans_id = db.relationship('Hd_Ans', backref='admin')
 
+
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128),nullable=False)
+
 
 #固定问答表
 class FAQ(db.Model):
@@ -81,6 +55,7 @@ class FAQ(db.Model):
     title = db.Column(db.String(255),nullable=False)
     answer = db.Column(db.String(255),nullable=False)
 
+
 #互动
 class HD(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -88,6 +63,7 @@ class HD(db.Model):
     question = db.Column(db.String(255),nullable=False)
     hd_ans_id = db.relationship('Hd_Ans',backref='hd')
     create_at = db.Column(db.DateTime, default=datetime.now)
+
 
 #回复
 class Hd_Ans(db.Model):
@@ -106,6 +82,7 @@ class A_banner(db.Model):
     cover_img = db.Column(db.String(255), nullable=False)
     content = db.Column(db.String(255),nullable=False)
 
+
 #心得
 class Experience(db.Model):
     __tablename__ = 'experience'
@@ -120,7 +97,6 @@ class Experience(db.Model):
 
     admin = db.relationship('Admin', primaryjoin='Experience.admin_id == Admin.id', backref='experience')
     dealer_training = db.relationship('DealerTraining', primaryjoin='Experience.dealer_training_id == DealerTraining.id', backref='experience')
-
 
 
 #经销商课程推荐表
@@ -138,6 +114,7 @@ class DealerGain(db.Model):
     dealer = db.relationship('Admin', primaryjoin='DealerGain.dealer_id == Admin.id', backref='dealer_gains')
     training = db.relationship('DealerTraining', primaryjoin='DealerGain.training_id == DealerTraining.id', backref='dealer_gains')
 
+
 #经销商课程学习表
 class DealerTraining(db.Model):
     __tablename__ = 'dealer_training'
@@ -149,7 +126,7 @@ class DealerTraining(db.Model):
     content = db.Column(db.String(255), nullable=False)
     desc = db.Column(db.String(255), nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    # recomended = db.Column(db.Integer, nullable=False)
+
 
 #感恩表
 class Gratitude(db.Model):
@@ -157,15 +134,9 @@ class Gratitude(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     from_id = db.Column(db.Integer, nullable=False, index=True)
-    # from_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     to_id = db.Column(db.Integer, nullable=False, index=True)
-    # to_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     content = db.Column(db.String(255), nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-
-    # from_ = db.relationship('User', primaryjoin='Gratitude.from_id == User.id', backref='gratitude')
-    # to_ = db.relationship('User', primaryjoin='Gratitude.to_id == User.id', backref='gratitude')
-
 
 
 #感恩之星表
@@ -178,6 +149,7 @@ class GratitudeStar(db.Model):
     year_month = db.Column(db.String(45), nullable=False)
 
     staff = db.relationship('User', primaryjoin='GratitudeStar.staff_id == User.id', backref='gratitude_stars')
+
 
 #课程表
 class Lesson(db.Model):
@@ -194,21 +166,10 @@ class Lesson(db.Model):
     is_look = db.Column(db.Integer, default=0)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     be_thumbs = db.Column(db.String(255))
-    # tools = db.relationship('Tool', backref='lesson', lazy='dynamic')
-    # permission = db.relationship('LessonPermission', backref='lesson', lazy='dynamic')
 
     oper = db.relationship('Operation', primaryjoin='Lesson.oper_id == Operation.id', backref='lesson')
     lecturer = db.relationship('User', primaryjoin='Lesson.lecturer_id == User.id', backref='lesson')
 
-# #课程讲师表
-# class Lecturer(db.Model):
-#     __tablename__ = 'lecturer'
-#
-#     id = db.Column(db.Integer, primary_key=True)
-#     staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-#
-#     staff = db.relationship('User', primaryjoin='Lecturer.staff_id == User.id', backref='lecturer')
-#
 
 #课程分类表
 class LessonClas(db.Model):
@@ -217,6 +178,7 @@ class LessonClas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
     img_src = db.Column(db.String(255), nullable=False)
+
 
 #课程收藏表
 class LessonCollection(db.Model):
@@ -229,6 +191,7 @@ class LessonCollection(db.Model):
     lesson = db.relationship('Lesson', primaryjoin='LessonCollection.lesson_id == Lesson.id', backref='lesson_collection')
     staff = db.relationship('User', primaryjoin='LessonCollection.staff_id == User.id', backref='lesson_collection')
 
+
 #课程评论表
 class LessonComment(db.Model):
     __tablename__ = 'lesson_comment'
@@ -236,12 +199,12 @@ class LessonComment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    # openid = db.Column(db.String(255),nullable=False)
     content = db.Column(db.String(255), nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     lsn = db.relationship('Lesson', primaryjoin='LessonComment.lsn_id == Lesson.id', backref='lesson_comment')
     staff = db.relationship('User', primaryjoin='LessonComment.staff_id == User.id', backref='lesson_comment')
+
 
 #课程权限表
 class LessonPermission(db.Model):
@@ -272,12 +235,14 @@ class News(db.Model):
     is_banner = db.Column(db.Integer,default=0)
     cls = db.relationship('NewsClas', primaryjoin='News.cls_id == NewsClas.id', backref='news')
 
+
 #新闻分类表
 class NewsClas(db.Model):
     __tablename__ = 'news_class'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
+
 
 #术式表
 class Operation(db.Model):
@@ -291,43 +256,18 @@ class Operation(db.Model):
     cls = db.relationship('LessonClas', primaryjoin='Operation.cls_id == LessonClas.id', backref='operation')
 
 
-# class Permission(db.Model):
-#权限表
-#     __tablename__ = 'permission'
-#
-#     id = db.Column(db.Integer, primary_key=True)
-#     code = db.Column(db.String(45), nullable=False)
-#     name = db.Column(db.String(45), nullable=False)
-#     desc = db.Column(db.String(255), nullable=False)
-
 #积分表
 class Point(db.Model):
     __tablename__ = 'points'
 
     id = db.Column(db.Integer, primary_key=True)
     staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-    total_points = db.Column(db.Integer)
-    # curr_points = db.Column(db.Integer)
+    total_points = db.Column(db.Float,default=0.0,nullable=False)
+    sumprice = db.Column(db.Float,default=0.0,nullable=False)
     level = db.Column(db.String(64))
-    # title = db.Column(db.String(64), nullable=False)
     creaet_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    # update_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     staff = db.relationship('User', primaryjoin='Point.staff_id == User.id', backref='points')
-
-
-#用户积分表
-
-# class PointsRecord(db.Model):
-#     __tablename__ = 'points_record'
-#
-#     id = db.Column(db.Integer, primary_key=True)
-#     staff_id = db.Column(db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-#     title = db.Column(db.String(45), nullable=False)
-#     desc = db.Column(db.String(255), nullable=False)
-#     points = db.Column(db.Integer, nullable=False)
-#
-#     staff = db.relationship('User', primaryjoin='PointsRecord.staff_id == User.id', backref='points_record')
 
 
 #经销商资源表
@@ -339,7 +279,7 @@ class DealerResource(db.Model):
     name = db.Column(db.String(64), nullable=False,unique=True)
     type = db.Column(db.String(64), nullable=False)
     content = db.Column(db.String(512), nullable=True)
-    # downloads = db.Column(db.Integer, nullable=False)
+
 
 #员工资源表
 class UserResource(db.Model):
@@ -365,8 +305,8 @@ class Testing(db.Model):
     lsn = db.relationship('Lesson', primaryjoin='Testing.lsn_id == Lesson.id', backref='testing')
     staff = db.relationship('User', primaryjoin='Testing.staff_id == User.id', backref='testing')
 
-#考试试题表
 
+#考试试题表
 class NewTest(db.Model):
     __tablename__ = 'newtest'
 
@@ -379,7 +319,6 @@ class NewTest(db.Model):
     picQues = db.Column(db.String(255))
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
-    # staff = db.relationship('User', primaryjoin='newtest.staff_id == User.id', backref='newtest')
 
 
 #工具表
@@ -404,6 +343,7 @@ class ToolCollection(db.Model):
 
     staff = db.relationship('User', primaryjoin='ToolCollection.staff_id == User.id', backref='tool_collection')
     tool = db.relationship('Tool', primaryjoin='ToolCollection.tool_id == Tool.id', backref='tool_collection')
+
 
 #员工任务学习表
 class TrainingTask(db.Model):
@@ -437,19 +377,24 @@ class User(db.Model):
     lsn_col = db.relationship('LessonCollection',backref='user')
     lsn_comment = db.relationship('LessonComment',backref='user')
     number = db.Column(db.Integer,default=0,nullable=False)
+    newnumber = db.Column(db.String(255),default='',nullable=False)
+    resnumber = db.Column(db.String(255),default='',nullable=False)
+    toolnumber = db.Column(db.String(255),default='',nullable=False)
     dayno = db.Column(db.Integer,default=0,nullable=False)
-    passed = db.Column(db.String(255))
+    passed = db.Column(db.String(255),default='',nullable=False)
     newtest = db.relationship('NewTest',backref='user')
     openid = db.Column(db.String(255))
-    lesson_ = db.Column(db.String(255))
+    lesson_ = db.Column(db.String(255),default='',nullable=False)
     jsapi_ticket = db.Column(db.String(128))
 
+    passed_dayno = db.Column(db.String(255), default='',nullable=False)
+    fullmarks = db.Column(db.String(255), default='',nullable=False)
+    lesson_dayno = db.Column(db.String(255), default='',nullable=False)
+    newnumber_day = db.Column(db.String(255), default='',nullable=False)
+    resnumber_day = db.Column(db.String(255), default='',nullable=False)
+    toolnumber_day = db.Column(db.String(255), default='',nullable=False)
 
     pos = db.relationship('Position', primaryjoin='User.pos_id == Position.id', backref='user')
-
-
-
-
 
 
 #员工考试表
@@ -464,18 +409,6 @@ class Question(db.Model):
 
     lsn = db.relationship('Lesson', primaryjoin='Question.lsn_id == Lesson.id', backref='question')
 
-#考试表
-# class UserTest(db.Model):
-#     __tablename__ = 'usertest'
-#
-#     id = db.Column(db.Integer, primary_key=True)
-#     staff_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-#     lsn_id = db.Column(db.Integer,db.ForeignKey('lesson.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
-#     score = db.Column(db.Float, nullable=False)
-#     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-#
-#     lsn = db.relationship('Lesson', primaryjoin='UserTest.lsn_id == Lesson.id', backref='usertest')
-#     staff = db.relationship('User', primaryjoin='UserTest.staff_id == User.id',backref='usertest')
 
 #课程点赞
 class LessonThumb(db.Model):
@@ -488,3 +421,47 @@ class LessonThumb(db.Model):
 
     lsn = db.relationship('Lesson', primaryjoin='LessonThumb.lsn_id == Lesson.id', backref='lesson_thumb')
     staff = db.relationship('User', primaryjoin='LessonThumb.staff_id == User.id', backref='lesson_thumb')
+
+
+#商品表
+class Production(db.Model):
+    __tablename__ = 'production'
+
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(255),nullable=False)
+    price = db.Column(db.Float,nullable=False)
+    number = db.Column(db.Integer,nullable=True)
+    product_no = db.Column(db.String(255),nullable=True)
+    img = db.Column(db.String(255),nullable=True)
+    product_date = db.Column(db.String(255),nullable=True)
+    content = db.Column(db.String(255),nullable=True)
+    instruction = db.Column(db.String(255),nullable=True)
+
+#订单表
+class Order(db.Model):
+    __tablename__ = 'order'
+
+    id = db.Column(db.Integer,primary_key=True)
+    order_no = db.Column(db.String(128),nullable=False)
+    price = db.Column(db.Float,nullable=False)
+    status = db.Column(db.Integer,default=0,nullable=False)
+    number = db.Column(db.String(255),nullable=False)
+    address = db.Column(db.String(255),nullable=False)
+    consignee = db.Column(db.String(68),nullable=False)
+    phone = db.Column(db.String(11),nullable=False)
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+    ser = db.relationship('User', primaryjoin='Order.user_id == User.id', backref='order')
+
+#购物车表
+# class Shopcart(db.Model):
+#     __tablename__ = 'shopcart'
+#
+#     id = db.Column(db.Integer,primary_key=True)
+#     product_id = db.Column(db.Integer,db.ForeignKey('production.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+#     user_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+#     number = db.Column(db.String(255),nullable=False)
+#
+#     product = db.relationship('Production', primaryjoin='Shopcart.product_id == Production.id', backref='shopcart')
+#     user = db.relationship('User', primaryjoin='Shopcart.user_id == User.id', backref='shopcart')

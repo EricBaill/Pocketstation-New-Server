@@ -1,7 +1,10 @@
+import datetime
+
 from flask import jsonify
 from flask_restful import Resource, reqparse
 from App.models import LessonClas, Operation, Lesson, Tool, LessonPermission, User, Position, \
     BusinessUnit, UserResource, db
+from sqlalchemy import extract, and_
 
 parser = reqparse.RequestParser()
 parser.add_argument(name='name',type=str,required=True,help='名称不能为空')
@@ -9,7 +12,7 @@ parser.add_argument(name='content',type=str,required=True,help='内容不能为�
 parser.add_argument(name='type',type=str,required=True,help='类型不能为空')
 parser.add_argument(name='hier',type=int)
 
-class UserResourceApi(Resource):
+class UserResource2(Resource):
     def get(self,user_id,hier,resId):
         if hier == str(1):
             list_ = []
@@ -236,3 +239,40 @@ class UserResourceApi5(Resource):
             return jsonify({'msg':'删除成功！'})
         else:
             return jsonify({'msg':'暂无信息！'})
+
+class UserResource1(Resource):
+    def get(self,res_id,user_id):
+        year_ = datetime.datetime.now().year
+        month_ = datetime.datetime.now().month
+        day_ = datetime.datetime.now().day
+        user_ = User.query.filter(User.id == user_id, and_(
+            extract('year', User.update_time) == year_,
+            extract('month', User.update_time) == month_,
+            extract('day', User.update_time) == day_
+        )).first()
+        user = User.query.filter(User.id==user_id).first()
+        if user:
+            if user.resnumber:
+                str1 = user.resnumber + '#' + res_id
+                str2 = str1.split('#')
+                str3 = list(set(str2))
+                user.resnumber = "#".join(str3)
+                user.resnumber_day = "#".join(str3)
+                db.session.commit()
+                if user_:
+                    pass
+                else:
+                    u = User.query.filter(User.id == user_id).first()
+                    u.resnumber_day = res_id
+                    db.session.commit()
+
+                return jsonify({'msg': '成功！'})
+            else:
+                user.resnumber = res_id
+                user.resnumber_day = res_id
+                db.session.commit()
+                return jsonify({'msg': '成功！'})
+
+
+        else:
+            return jsonify({})

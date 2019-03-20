@@ -1,12 +1,15 @@
+import datetime
+from sqlalchemy import extract, and_, desc
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
-from App.models import db, News, NewsClas
+from App.models import db, News, NewsClas, User
+
 
 #获取，添加
 class NewsResource(Resource):
     def get(self):
-        news = News.query.all()
+        news = News.query.order_by(desc('id')).all()
         list_ = []
         for new in news:
             class_id = new.cls_id
@@ -55,7 +58,7 @@ class NewsResource(Resource):
             db.session.commit()
         except Exception as e:
             print(str(e))
-        new = News.query.filter(News.name == name).order_by(News.id.desc()).first()
+        new = News.query.filter(News.name == name).first()
         id = new.id
         cls_new = NewsClas.query.filter(NewsClas.id.__eq__(cls_id)).first()
         data = {
@@ -73,27 +76,52 @@ class NewsResource(Resource):
 
 #修改，删除
 class NewsResource1(Resource):
-    def get(self,id):
+    def get(self,id,staff_id):
+        year_ = datetime.datetime.now().year
+        month_ = datetime.datetime.now().month
+        day_ = datetime.datetime.now().day
+        user_ = User.query.filter(User.id==staff_id, and_(
+            extract('year', User.update_time) == year_,
+            extract('month', User.update_time) == month_,
+            extract('day', User.update_time) == day_
+        )).first()
         new = News.query.filter(News.id.__eq__(id)).first()
-        if new:
-            cls_new = NewsClas.query.filter(NewsClas.id.__eq__(new.cls_id)).first()
-            data = {
-                'id': new.id,
-                'name': new.name,
-                'content': new.content,
-                'brief': new.brief,
-                'top': new.top,
-                'create_at': new.create_at,
-                'img_src': new.img_src,
-                'cls': {
-                    'name': cls_new.name,
-                    'id': cls_new.id
-                }
-            }
-            return jsonify(data)
+        cls_new = NewsClas.query.filter(NewsClas.id.__eq__(new.cls_id)).first()
+        user = User.query.filter(User.id==staff_id).first()
+        if user.newnumber:
+            str1 = user.newnumber + '#' + id
+            str2 = str1.split('#')
+            str3 = list(set(str2))
+            user.newnumber = "#".join(str3)
+            user.newnumber_day = "#".join(str3)
+            db.session.commit()
         else:
-            return jsonify({'err':'信息不存在！'})
+            user.newnumber = id
+            user.newnumber_day = id
+            db.session.commit()
+        if user_:
+            pass
+        else:
+            u = User.query.filter(User.id==staff_id).first()
+            u.newnumber_day = id
+            db.session.commit()
 
+        data = {
+            'id': new.id,
+            'name': new.name,
+            'content': new.content,
+            'brief': new.brief,
+            'top': new.top,
+            'create_at': new.create_at,
+            'img_src': new.img_src,
+            'cls': {
+                'name': cls_new.name,
+                'id': cls_new.id
+            }
+        }
+        return jsonify(data)
+
+class News11(Resource):
     #设置置顶
     def post(self,id):
         parser = reqparse.RequestParser()
@@ -209,7 +237,7 @@ class NewsResource3(Resource):
 class NewsResource4(Resource):
     def get(self,type_):
         list_ = []
-        news = News.query.filter(News.type_==type_).all()
+        news = News.query.filter(News.type_==type_).order_by(News.id.desc()).all()
         if news:
             for new in news:
                 cls_new = NewsClas.query.filter(NewsClas.id.__eq__(new.cls_id)).first()

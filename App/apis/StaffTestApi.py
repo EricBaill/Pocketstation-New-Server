@@ -1,7 +1,10 @@
+import datetime
+
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
 from App.models import Question, Testing, db, User
+from sqlalchemy import extract, and_
 
 
 class StaffTestResource(Resource):
@@ -29,6 +32,15 @@ class StaffTestResource1(Resource):
         lsn_id = parse.get('lsn_id')
         staff_id = parse.get('staff_id')
         score = parse.get('score')
+
+        year_ = datetime.datetime.now().year
+        month_ = datetime.datetime.now().month
+        day_ = datetime.datetime.now().day
+        user_ = User.query.filter(User.id == staff_id, and_(
+            extract('year', User.update_time) == year_,
+            extract('month', User.update_time) == month_,
+            extract('day', User.update_time) == day_
+        )).first()
         user = User.query.filter(User.id==staff_id).first()
         if user:
             if score == 1.0:
@@ -37,25 +49,53 @@ class StaffTestResource1(Resource):
                     str2 = str1.split('#')
                     str3 = list(set(str2))
                     user.passed = "#".join(str3)
+                    user.fullmarks = "#".join(str3)
                     test = Testing()
                     test.lsn_id = lsn_id
                     test.staff_id = staff_id
                     test.score = score
                     db.session.add(test)
                     db.session.commit()
+
+                    if user_:
+                        pass
+                    else:
+                        u = User.query.filter(User.id == staff_id).first()
+                        u.fullmarks = lsn_id
+                        db.session.commit()
+
                     return jsonify({'msg':'提交成功！'})
                 else:
                     user.passed = str(lsn_id)
+                    user.fullmarks = str(lsn_id)
                     db.session.commit()
                     return jsonify({'msg': '提交成功！'})
             else:
-                test = Testing()
-                test.lsn_id = lsn_id
-                test.staff_id = staff_id
-                test.score = score
-                db.session.add(test)
-                db.session.commit()
-                return jsonify({'msg': '提交成功！'})
+                if user.passed:
+                    str1 = user.passed + '#' + str(lsn_id)
+                    str2 = str1.split('#')
+                    str3 = list(set(str2))
+                    user.passed = "#".join(str3)
+                    user.passed_dayno = "#".join(str3)
+                    test = Testing()
+                    test.lsn_id = lsn_id
+                    test.staff_id = staff_id
+                    test.score = score
+                    db.session.add(test)
+                    db.session.commit()
 
+                    if user_:
+                        pass
+                    else:
+                        u = User.query.filter(User.id == staff_id).first()
+                        u.passed_dayno = lsn_id
+                        db.session.commit()
+
+                    return jsonify({'msg':'提交成功！'})
+                else:
+                    user.passed = str(lsn_id)
+                    user.passed_dayno = str(lsn_id)
+                    db.session.commit()
+                    return jsonify({'msg': '提交成功！'})
         else:
             return jsonify({})

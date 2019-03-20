@@ -140,7 +140,6 @@ class LessonResource(Resource):
         lecturer_id = parse.get('lecturer_id')
         permissions = parse.get('permissions')
         permissions = eval(permissions)
-        print(permissions)
         for keys,vals in permissions.items():
             bu_id = vals['bu_id']
             pos = Position.query.filter(Position.bu_id==bu_id).first()
@@ -169,39 +168,28 @@ class LessonResource(Resource):
                     resData = response.json()
 
                     openid = u_openid
-                    template_id = resData['template_list'][-2]['template_id']
-                    url = 'http://192.168.1.104：8000/'
+                    template_id = resData['template_list'][-1]['template_id']
+                    url = 'https://pocketstation.cn/'
 
-                    year = datetime.datetime.now().year
-                    month = datetime.datetime.now().month
-                    day = datetime.datetime.now().day
                     msg = {
                         "touser": openid,
                         "template_id": template_id,
                         "url": url,
                         "data": {
-                            "userName": {
-                                "value": user.name,
+                            "first": {
+                                "value": "你好，{}已经上传到口袋加油站专业共享板块，".format(name),
                                 "color": "#000"
                             },
-                            "courseName": {
+                            "keyword1": {
                                 "value": name,
                                 "color": "#000"
                             },
-                            "date": {
-                                "value": str(year) + "年" + str(month) + "月"+ str(day),
+                            "keyword2": {
+                                "value": user.name,
                                 "color": "#000"
                             },
-                            # "remark": {
-                            #     "value": "想了解师资详情，可回复2",
-                            #     "color": "#000"
-                            # },
-                            # "remark": {
-                            #     "value": "想了解更多课程，可回复3",
-                            #     "color": "#000"
-                            # },
                             "remark": {
-                                "value": "感谢您对口袋加油站的支持。",
+                                "value": "请点击查看！",
                                 "color": "#000"
                             },
 
@@ -372,7 +360,7 @@ class LessonResource1(Resource):
                                     },
                                 }
                                 return jsonify(data)
-                    elif staff_id == 'dealer':
+                    else:
                         if ques:
                             data = {
                                 "be_thumbs": be_thumbs,
@@ -463,9 +451,8 @@ class LessonResource1(Resource):
                                 },
                             }
                             return jsonify(data)
-                    else:
-                        pass
             else:
+                print('=====')
                 les_permissions = LessonPermission.query.filter(LessonPermission.lsn_id.__eq__(lesson.id)).all()
                 for les_permission in les_permissions:
                     bu1 = BusinessUnit.query.filter(BusinessUnit.id.__eq__(les_permission.bu_id)).first()
@@ -1000,6 +987,8 @@ class LessonResource1(Resource):
                             }
                             return jsonify(data)
 
+
+class Lesson11(Resource):
     def post(self,id):
         parser = reqparse.RequestParser()
         parser.add_argument(name='recommended', type=int)
@@ -1012,6 +1001,7 @@ class LessonResource1(Resource):
             return jsonify({'msg': '设置成功！'})
         else:
             return jsonify({'err': '暂无信息！'})
+
 
     def put(self,id):
         parse = parser.parse_args()
@@ -1029,11 +1019,17 @@ class LessonResource1(Resource):
     def delete(self,id):
         lesson = Lesson.query.filter(Lesson.id.__eq__(id)).first()
         if lesson:
+            perms = LessonPermission.query.filter(LessonPermission.lsn_id==lesson.id).all()
+            if perms:
+                for perm in perms:
+                    db.session.delete(perm)
+            else:
+                pass
             db.session.delete(lesson)
             db.session.commit()
             return jsonify({'msg':'删除成功！'})
         else:
-            return jsonify({'err':404})
+            return jsonify({})
 
 class LessonResource2(Resource):
     def get(self,subPart_id,openid,types):

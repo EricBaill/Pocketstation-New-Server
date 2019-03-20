@@ -1,5 +1,6 @@
 import datetime
 import json
+from sqlalchemy import extract, and_
 
 import requests
 from flask import jsonify
@@ -19,34 +20,64 @@ class TrainTaskResource(Resource):
                 lsn = Lesson.query.filter(Lesson.id.__eq__(traintask.lsn_id)).first()
                 oper = Operation.query.filter(Operation.id.__eq__(lsn.oper_id)).first()
                 lsn_cls = LessonClas.query.filter(LessonClas.id.__eq__(oper.cls_id)).first()
-                data = {
-                    'id':traintask.id,
-                    'limit':traintask.limit,
-                    'percent':traintask.percent,
-                    'create_at':traintask.create_at,
-                    'finish_at':traintask.finish_at,
-                    "days_gone": 120,
-                    'staff':{
-                        'id':user.id,
-                        'name':user.name,
-                        'email':user.email,
-                        'tel':user.tel,
-                        'status':user.lesson_,
-                        },
-                    'lsn': {
-                        'id': lsn.id,
-                        'name': lsn.name,
-                        'oprt': {
-                            'id': oper.id,
-                            'name': oper.name,
-                            'cls': {
-                                'id': lsn_cls.id,
-                                'name': lsn_cls.name
+                if user.lesson_:
+                    data = {
+                        'id':traintask.id,
+                        'limit':traintask.limit,
+                        'percent':traintask.percent,
+                        'create_at':traintask.create_at,
+                        'finish_at':traintask.finish_at,
+                        "days_gone": 120,
+                        'staff':{
+                            'id':user.id,
+                            'name':user.name,
+                            'email':user.email,
+                            'tel':user.tel,
+                            'status':user.lesson_,
+                            },
+                        'lsn': {
+                            'id': lsn.id,
+                            'name': lsn.name,
+                            'oprt': {
+                                'id': oper.id,
+                                'name': oper.name,
+                                'cls': {
+                                    'id': lsn_cls.id,
+                                    'name': lsn_cls.name
+                                }
                             }
                         }
                     }
-                }
-                list_.append(data)
+                    list_.append(data)
+                else:
+                    data = {
+                        'id': traintask.id,
+                        'limit': traintask.limit,
+                        'percent': traintask.percent,
+                        'create_at': traintask.create_at,
+                        'finish_at': traintask.finish_at,
+                        "days_gone": 120,
+                        'staff': {
+                            'id': user.id,
+                            'name': user.name,
+                            'email': user.email,
+                            'tel': user.tel,
+                            'status': int(0),
+                        },
+                        'lsn': {
+                            'id': lsn.id,
+                            'name': lsn.name,
+                            'oprt': {
+                                'id': oper.id,
+                                'name': oper.name,
+                                'cls': {
+                                    'id': lsn_cls.id,
+                                    'name': lsn_cls.name
+                                }
+                            }
+                        }
+                    }
+                    list_.append(data)
             return jsonify(list_)
         else:
             return jsonify([])
@@ -93,7 +124,7 @@ class TrainTaskResource(Resource):
 
                     openid = u_openid
                     template_id = resData['template_list'][-1]['template_id']
-                    url = 'http://192.168.1.104：8000/'
+                    url = 'https://pocketstation.cn/'
                     time_ = datetime.datetime.now().strftime('%F %T')
                     msg = {
                         "touser": openid,
@@ -157,7 +188,7 @@ class TrainTaskResource(Resource):
 
                     openid = u_openid
                     template_id = resData['template_list'][-1]['template_id']
-                    url = 'http://192.168.1.104：8000/'
+                    url = 'https://pocketstation.cn/'
                     time_ = datetime.datetime.now().strftime('%F %T')
                     msg = {
                         "touser": openid,
@@ -234,7 +265,10 @@ class LearnTask(Resource):
                     for lesson in lessons:
                         data = {
                             'id':learn.id,
-                            'finish_at':learn.finish_at,
+                            'create_at':learn.create_at.strftime('%Y/%m/%d'),
+                            'limit':learn.limit,
+                            'finish_at':learn.finish_at.strftime('%Y/%m/%d'),
+                            'now':datetime.datetime.now().strftime('%Y/%m/%d'),
                             'lsn':{
                                 'id':lesson.id,
                                 'name':lesson.name
@@ -245,22 +279,40 @@ class LearnTask(Resource):
         else:
             return jsonify([])
 
+
 #员工学习课程记录
 class LearnTask1(Resource):
     def get(self,staff_id,lsn_id):
-        staff = User.query.filter(User.id==staff_id).first()
-        if staff:
-            if staff.lesson_:
-                str1 = staff.lesson_ + '#' + lsn_id
-                str2 = str1.split('#')
-                str3 = list(set(str2))
-                staff.lesson_ = "#".join(str3)
-                db.session.commit()
-                return jsonify({'msg':'成功'})
-            else:
-                staff.lesson_ = lsn_id
-                db.session.commit()
-                return jsonify({'msg': '成功'})
+        year_ = datetime.datetime.now().year
+        month_ = datetime.datetime.now().month
+        day_ = datetime.datetime.now().day
+        user_ = User.query.filter(User.id == staff_id, and_(
+            extract('year', User.update_time) == year_,
+            extract('month', User.update_time) == month_,
+            extract('day', User.update_time) == day_
+        )).first()
 
+        staff = User.query.filter(User.id==staff_id).first()
+        if staff.lesson_:
+            str1 = staff.lesson_ + '#' + lsn_id
+            str2 = str1.split('#')
+            str3 = list(set(str2))
+            staff.lesson_ = "#".join(str3)
+            staff.lesson_dayno = "#".join(str3)
+            db.session.commit()
+
+            if user_:
+                pass
+            else:
+                u = User.query.filter(User.id == staff_id).first()
+                u.lesson_dayno = lsn_id
+                db.session.commit()
+
+            return jsonify({'msg':'成功'})
         else:
-            return jsonify({})
+            staff.lesson_ = lsn_id
+            staff.lesson_dayno = lsn_id
+            db.session.commit()
+            return jsonify({'msg': '成功'})
+
+
