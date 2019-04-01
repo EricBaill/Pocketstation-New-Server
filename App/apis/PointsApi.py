@@ -122,7 +122,7 @@ class PointsResource(Resource):
                 elif len(from_grats) > 8 and len(to_grats) > 8:
                     l = 8 * 2
                     l1 = 8 * 2
-                    points = str0 +  str1 + str2 + str3 + str4 + str5 + l + l1
+                    points = str0 + str1 + str2 + str3 + str4 + str5 + l + l1
                     point = points - poin.sumprice
 
                     if 0 <= point <= 50:
@@ -150,7 +150,7 @@ class PointsResource(Resource):
                 elif len(from_grats) <= 8 and len(to_grats) > 8:
                     l = len(from_grat) * 2
                     l1 = 8 * 2
-                    points = str0 +  str1 + str2 + str3 + str4 + str5 + l + l1
+                    points = str0 + str1 + str2 + str3 + str4 + str5 + l + l1
                     point = points - poin.sumprice
 
                     if 0 <= point <= 50:
@@ -178,7 +178,7 @@ class PointsResource(Resource):
                 elif len(from_grats) > 8 and len(to_grats) <= 8:
                     l = 8 * 2
                     l1 = len(to_grat) * 2
-                    points = str0 +  str1 + str2 + str3 + str4 + str5 + l + l1
+                    points = str0 + str1 + str2 + str3 + str4 + str5 + l + l1
                     point = points - poin.sumprice
 
                     if 0 <= point <= 50:

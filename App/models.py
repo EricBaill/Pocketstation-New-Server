@@ -452,7 +452,7 @@ class Order(db.Model):
     user_id = db.Column(db.Integer,db.ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
-    ser = db.relationship('User', primaryjoin='Order.user_id == User.id', backref='order')
+    user = db.relationship('User', primaryjoin='Order.user_id == User.id', backref='order')
 
 #购物车表
 # class Shopcart(db.Model):

@@ -40,6 +40,7 @@ from App.apis.TrainTaskApi import TrainTaskResource, TrainTaskResource1, LearnTa
 from App.apis.UserQuesApi import UserQuesResource, UserQuesResource1, UserQuesResource2
 from App.apis.UserResourceApi import UserResource2, UserResourceApi1, UserResourceApi2, UserResourceApi3, \
     UserResourceApi4, UserResourceApi5, UserResource1
+from App.apis.test import Test
 
 api = Api()
 #需要注意  api的初始化 要和init方法联系 否则无法初始化
@@ -239,6 +240,8 @@ api.add_resource(DelOrder,'/api/v2/delete/order/<id>/')
 api.add_resource(GetallOrders,'/api/v2/get/all/orders/')
 #修改订单状态
 api.add_resource(OrderStatus,'/api/v2/status/order/<id>/')
+
+api.add_resource(Test,'/api/v2/ttest/<staff_id>/')
 
 
 

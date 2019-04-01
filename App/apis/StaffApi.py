@@ -1,7 +1,8 @@
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
-from App.models import User, db, Position, BusinessUnit
+from App.models import User, db, Position, BusinessUnit, Order, Lesson, GratitudeStar, LessonCollection, LessonComment, \
+    Point, Testing, ToolCollection, TrainingTask, LessonThumb, LessonPermission
 
 
 class StaffRespource(Resource):
@@ -139,6 +140,72 @@ class StaffRespource1(Resource):
     def delete(self,user_id):
         user = User.query.filter(User.id.__eq__(user_id)).first()
         if user:
+            orders = Order.query.filter(Order.user_id==user.id).all()
+            lessons = Lesson.query.filter(Lesson.lecturer_id==user.id).all()
+            stars = GratitudeStar.query.filter(GratitudeStar.staff_id==user.id).all()
+            collections = LessonCollection.query.filter(LessonCollection.staff_id==user.id).all()
+            comments = LessonComment.query.filter(LessonComment.staff_id==user.id).all()
+            points = Point.query.filter(Point.staff_id==user.id).all()
+            tests = Testing.query.filter(Testing.staff_id==user.id).all()
+            toolCollections = ToolCollection.query.filter(ToolCollection.staff_id==user.id).all()
+            tasks = TrainingTask.query.filter(TrainingTask.staff_id==user.id).all()
+            thumbs = LessonThumb.query.filter(LessonThumb.staff_id==user.id).all()
+            if orders:
+                for order in orders:
+                    db.session.delete(order)
+            else:
+                pass
+            if lessons:
+                for les in lessons:
+                    permission = LessonPermission.query.filter(LessonPermission.lsn_id==les.id).first()
+                    if permission:
+                        db.session.delete(permission)
+                    else:
+                        pass
+                    db.session.delete(les)
+            else:
+                pass
+            if stars:
+                for star in stars:
+                    db.session.delete(star)
+            else:
+                pass
+            if collections:
+                for collection in collections:
+                    db.session.delete(collection)
+            else:
+                pass
+            if comments:
+                for comment in comments:
+                    db.session.delete(comment)
+            else:
+                pass
+            if points:
+                for point in points:
+                    db.session.delete(point)
+            else:
+                pass
+            if tests:
+                for test in tests:
+                    db.session.delete(test)
+            else:
+                pass
+            if toolCollections:
+                for toolCollection in toolCollections:
+                    db.session.delete(toolCollection)
+            else:
+                pass
+            if tasks:
+                for task in tasks:
+                    db.session.delete(task)
+            else:
+                pass
+            if thumbs:
+                for thumb in thumbs:
+                    db.session.delete(thumb)
+            else:
+                pass
+
             db.session.delete(user)
             db.session.commit()
             return jsonify({'msg':'删除成功！'})

@@ -46,8 +46,10 @@ class Order_(Resource):
         if orders:
             for order in orders:
                 list_.append(order.price)
-            prices = sum(list_) + point.sumprice
+            prices = sum(list_)
+            print(prices)
             point.sumprice = prices
+            print(point.sumprice)
             db.session.commit()
         else:
             pass
